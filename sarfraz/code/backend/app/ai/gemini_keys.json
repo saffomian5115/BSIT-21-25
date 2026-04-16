@@ -1,0 +1,42 @@
+[
+  {
+    "id": "55bebfc0",
+    "key": "AIzaSyDyADfIuutUA-gNE2OpvGt2XB2Kg5VgysE",
+    "label": "key 2",
+    "active": true,
+    "quota_exceeded_until": 0,
+    "requests_today": 2,
+    "quota_hit_count": 4,
+    "last_reset": "2026-04-15"
+  },
+  {
+    "id": "2d32d983",
+    "key": "AIzaSyCfkY9O_i6yl3H3WJYSvG6LdM9o-nsnTgg",
+    "label": "key",
+    "active": true,
+    "quota_exceeded_until": 0,
+    "requests_today": 1,
+    "quota_hit_count": 3,
+    "last_reset": "2026-04-15"
+  },
+  {
+    "id": "89488694",
+    "key": "AIzaSyBGrbn1q05HbArQ8y6_zmPbSn8seQHdW0w",
+    "label": "key 1",
+    "active": true,
+    "quota_exceeded_until": 1776242126.599297,
+    "requests_today": 0,
+    "quota_hit_count": 3,
+    "last_reset": "2026-04-15"
+  },
+  {
+    "id": "535aff55",
+    "key": "AIzaSyB1qwitxJNczAXTyDaQntADRUSVqaVRTj0",
+    "label": "key 3",
+    "active": true,
+    "quota_exceeded_until": 1776242144.4391606,
+    "requests_today": 0,
+    "quota_hit_count": 3,
+    "last_reset": "2026-04-15"
+  }
+]
