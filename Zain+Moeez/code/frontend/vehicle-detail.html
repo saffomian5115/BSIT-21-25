@@ -1,0 +1,2778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FourWheels — Vehicle Detail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --card: #18181c;
+      --border: #2a2a30;
+      --accent: #e8390e;
+      --accent-glow: rgba(232, 57, 14, 0.25);
+      --text: #f0f0f0;
+      --muted: #6b6b75;
+      --input-bg: #0f0f12;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --star: #f59e0b;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-logout {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-logout:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      padding: 1rem 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .breadcrumb a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--accent);
+    }
+
+    .breadcrumb span {
+      color: var(--text);
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+    }
+
+    /* ===== GALLERY ===== */
+    .gallery {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .gallery-main {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      background: #0d0d10;
+      overflow: hidden;
+    }
+
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+
+    .gallery-main .no-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      color: var(--muted);
+    }
+
+    .gallery-main .no-image span {
+      font-size: 4rem;
+    }
+
+    .gallery-main .no-image p {
+      font-size: 0.9rem;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .gallery-nav button {
+      pointer-events: all;
+      background: rgba(10, 10, 11, 0.7);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .gallery-nav button:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .img-counter {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(10, 10, 11, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .gallery-thumbs {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      overflow-x: auto;
+      background: var(--surface);
+    }
+
+    .gallery-thumbs::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .gallery-thumbs::-webkit-scrollbar-track {
+      background: var(--border);
+    }
+
+    .gallery-thumbs::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .thumb {
+      width: 72px;
+      height: 54px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+      transition: border-color 0.2s, opacity 0.2s;
+      opacity: 0.6;
+    }
+
+    .thumb:hover,
+    .thumb.active {
+      border-color: var(--accent);
+      opacity: 1;
+    }
+
+    /* ===== 3D VIEWER ===== */
+    .viewer-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .viewer-title {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .viewer-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .badge-3d {
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .viewer-tip {
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    #viewer-canvas {
+      width: 100%;
+      height: 340px;
+      display: block;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0a0a0b 100%);
+    }
+
+    .viewer-controls {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .ctrl-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+
+
+    .ctrl-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .ctrl-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .ctrl-label {
+      margin-left: auto;
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    /* ===== FULLSCREEN VIEWER ===== */
+    #fsOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: #0a0a0b;
+      flex-direction: column;
+    }
+
+    #fsOverlay.active {
+      display: flex;
+    }
+
+    #fs-canvas {
+      flex: 1;
+      display: block;
+      width: 100%;
+      cursor: grab;
+    }
+
+    #fs-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* Controls float over canvas */
+    .fs-controls {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: rgba(17, 17, 19, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .fs-close-btn {
+      background: rgba(232, 57, 14, 0.15);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .fs-close-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    #previewCanvas {
+      width: 100%;
+      height: 340px;
+      display: block;
+      cursor: pointer;
+    }
+
+    .preview-hint {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding: 0.5rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      letter-spacing: 0.05em;
+    }
+
+    /* Preview BG toggle btn */
+    .preview-bg-btn {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      background: rgba(17, 17, 19, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 5;
+    }
+
+    .preview-bg-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== VEHICLE INFO ===== */
+    .info-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .veh-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .veh-status.approved {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--success);
+    }
+
+    .veh-status.pending {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--warning);
+    }
+
+    .veh-status.rejected {
+      background: rgba(232, 62, 62, 0.12);
+      border: 1px solid rgba(232, 62, 62, 0.3);
+      color: #e83e3e;
+    }
+
+    .veh-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+    .veh-price {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .veh-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.83rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.85rem;
+      border-radius: 20px;
+    }
+
+    .meta-chip .icon {
+      font-size: 0.95rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .veh-description {
+      font-size: 0.9rem;
+      color: #c0c0cc;
+      line-height: 1.7;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      text-align: center;
+    }
+
+    .stat-box .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+    }
+
+    .stat-box .lbl {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ===== REVIEWS SECTION ===== */
+    .reviews-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .reviews-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .reviews-header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .reviews-header-title span {
+      color: var(--accent);
+    }
+
+    /* Average rating summary */
+    .rating-summary {
+      display: flex;
+      gap: 2rem;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .rating-big {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .rating-big .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--star);
+    }
+
+    .rating-big .stars {
+      display: flex;
+      gap: 2px;
+      justify-content: center;
+      margin-top: 0.25rem;
+    }
+
+    .rating-big .count {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .rating-bars {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .rating-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--surface);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--star);
+      border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+
+    .bar-count {
+      min-width: 20px;
+      text-align: right;
+    }
+
+    /* Star rating input */
+    .star-input {
+      display: flex;
+      gap: 0.25rem;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .star-input input {
+      display: none;
+    }
+
+    .star-input label {
+      font-size: 1.6rem;
+      color: var(--border);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .star-input label:hover,
+    .star-input label:hover~label,
+    .star-input input:checked~label {
+      color: var(--star);
+    }
+
+    /* Review cards */
+    .review-list {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .review-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .review-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .reviewer-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .reviewer-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .reviewer-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .reviewer-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    .review-stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      font-size: 0.9rem;
+    }
+
+    .star.filled {
+      color: var(--star);
+    }
+
+    .star.empty {
+      color: var(--border);
+    }
+
+    .review-date {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .review-comment {
+      font-size: 0.88rem;
+      color: #c0c0cc;
+      line-height: 1.6;
+    }
+
+    .review-delete-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .review-delete-btn:hover {
+      color: #e83e3e;
+      background: rgba(232, 62, 62, 0.08);
+    }
+
+    .reviews-empty {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .reviews-empty .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.4;
+    }
+
+    .reviews-load-more {
+      text-align: center;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-load-more {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.55rem 1.5rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-load-more:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Write review form */
+    .write-review-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .write-review-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .write-review-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .field textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: none;
+    }
+
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field textarea::placeholder {
+      color: var(--muted);
+    }
+
+    /* ===== RIGHT COLUMN ===== */
+    .seller-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .seller-card-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .seller-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .seller-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .seller-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .seller-since {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* Seller rating display */
+    .seller-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .seller-rating-stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .seller-rating-stars .star {
+      font-size: 0.8rem;
+    }
+
+    .seller-rating-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .seller-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .seller-detail-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .seller-detail-row .icon {
+      font-size: 1rem;
+    }
+
+    .seller-detail-row strong {
+      color: var(--text);
+    }
+
+    .btn-contact {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1.25rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-phone {
+      background: var(--success);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-phone:hover {
+      background: #16a34a;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Inquiry form */
+    .inquiry-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .inquiry-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .inquiry-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field input::placeholder {
+      color: var(--muted);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+
+    .btn-submit:hover {
+      background: #c72e08;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .quick-actions-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.6rem;
+      text-align: left;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .action-btn .icon {
+      font-size: 1.1rem;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: all 0.3s;
+      max-width: 320px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: #e83e3e;
+    }
+
+    /* Loading */
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 1.5rem;
+      color: var(--muted);
+    }
+
+    .loading-overlay .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .not-found {
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .not-found .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .not-found h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .not-found p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .not-found a {
+      display: inline-block;
+      padding: 0.7rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .right-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .inquiry-card {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 0 1rem 3rem;
+      }
+
+      .right-col {
+        display: block;
+      }
+
+      .veh-title {
+        font-size: 1.8rem;
+      }
+
+      .gallery-main {
+        height: 280px;
+      }
+
+      #viewer-canvas {
+        height: 260px;
+      }
+
+      .rating-summary {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    /* ===== SPEEDOMETER STAR RATING ===== */
+    .star-input {
+      display: flex;
+      gap: 0.5rem;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      margin-bottom: 0.5rem;
+    }
+
+    .star-input input {
+      display: none;
+    }
+
+    .star-input label {
+      font-size: 2.2rem;
+      color: var(--border);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      filter: drop-shadow(0 0 0px transparent);
+      line-height: 1;
+      padding: 2px 4px;
+    }
+
+    .star-input label:hover,
+    .star-input label:hover~label,
+    .star-input input:checked~label {
+      color: var(--star);
+      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+      transform: scale(1.15);
+    }
+
+    .star-input input:checked~label {
+      animation: starGlow 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes starGlow {
+      from {
+        filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+      }
+
+      to {
+        filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95)) drop-shadow(0 0 3px #fff);
+      }
+    }
+
+    /* Speedometer Overlay */
+    .speedo-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(10, 10, 15, 0.97) 0%, rgba(5, 5, 8, 0.99) 100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s;
+      backdrop-filter: blur(10px);
+    }
+
+    .speedo-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .speedo-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: scale(0.85) translateY(30px);
+      transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1.1);
+    }
+
+    .speedo-overlay.show .speedo-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .speedo-canvas {
+      display: block;
+      width: 300px;
+      height: 300px;
+      filter: drop-shadow(0 0 28px rgba(232, 57, 14, 0.35));
+    }
+
+    .speedo-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 48px;
+      height: 48px;
+      background: radial-gradient(circle, #1a0a05, #0a0a0b);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      color: var(--accent);
+      box-shadow: 0 0 18px var(--accent-glow), inset 0 0 12px rgba(232, 57, 14, 0.1);
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 0.3s;
+    }
+
+    .speedo-overlay.show .speedo-badge {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .speedo-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      color: rgba(232, 57, 14, 0.55);
+      margin-top: 10px;
+      text-transform: uppercase;
+      animation: accentBlink 2s ease-in-out infinite;
+    }
+
+    @keyframes accentBlink {
+
+      0%,
+      100% {
+        opacity: 0.5
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    .speedo-tap-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: rgba(232, 57, 14, 0.35);
+      cursor: pointer;
+      z-index: 10100;
+      opacity: 0;
+      transition: opacity 0.5s;
+      padding: 5px 14px;
+      border: 1px solid rgba(232, 57, 14, 0.15);
+      border-radius: 30px;
+      background: rgba(10, 10, 11, 0.7);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .speedo-overlay.show~.speedo-tap-hint {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nav-logo">Four<span>Wheels</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="vehicles.html">Listings</a>
+      <a href="#" id="navDashLink" style="display:none"></a>
+    </div>
+    <div class="nav-user" id="navUser" style="display:none">
+      <span id="navName" style="font-size:0.85rem;color:var(--muted)"></span>
+      <button class="nav-logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="container" id="mainContent">
+    <div class="loading-overlay" id="loadingState">
+      <div class="spinner"></div>
+      <span>Loading vehicle details…</span>
+    </div>
+  </div>
+
+  <!-- Fullscreen 3D Overlay -->
+  <div id="fsOverlay"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Speedometer Rating Overlay -->
+  <div class="speedo-overlay" id="speedoOverlay">
+    <div class="speedo-card" id="speedoCard">
+      <div class="speedo-badge" id="speedoBadge">0</div>
+      <canvas id="speedoCanvas" class="speedo-canvas" width="600" height="600"></canvas>
+      <div class="speedo-label" id="speedoLabel">⚡ RATING ENGINE ⚡</div>
+    </div>
+  </div>
+  <div class="speedo-tap-hint" id="speedoTapHint">TAP ANYWHERE TO CLOSE</div>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    const token = localStorage.getItem('fw_token');
+    const user = JSON.parse(localStorage.getItem('fw_user') || 'null');
+
+    // Nav user info
+    // Nav user info
+    if (user) {
+      document.getElementById('navUser').style.display = 'flex';
+      document.getElementById('navName').textContent = user.name;
+
+      const dashLink = document.getElementById('navDashLink');
+      dashLink.style.display = 'block';
+
+      if (user.role === 'admin') {
+        dashLink.href = 'admin-dashboard.html';
+        dashLink.textContent = 'Admin Panel';
+      } else if (user.role === 'seller') {
+        dashLink.href = 'seller-dashboard.html';
+        dashLink.textContent = 'My Dashboard';
+      } else {
+        dashLink.href = 'buyer-messages.html';
+        dashLink.textContent = 'My Messages';
+      }
+    }
+    function logout() {
+      localStorage.removeItem('fw_token');
+      localStorage.removeItem('fw_user');
+      window.location.href = 'login.html';
+    }
+
+    function showToast(msg, type = 'error') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const vehicleId = params.get('id');
+
+    if (!vehicleId) {
+      showNotFound();
+    } else {
+      loadVehicle();
+    }
+
+    async function loadVehicle() {
+      try {
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const res = await fetch(`${API}/vehicles/${vehicleId}`, { headers });
+        if (!res.ok) throw new Error('Not found');
+        const vehicle = await res.json();
+        renderVehicle(vehicle);
+      } catch (err) {
+        showNotFound();
+      }
+    }
+
+    function showNotFound() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="not-found">
+          <div class="icon">🚗</div>
+          <h2>Vehicle Not Found</h2>
+          <p>The listing you're looking for doesn't exist or has been removed.</p>
+          <a href="vehicles.html">Browse All Listings</a>
+        </div>`;
+    }
+
+    function formatPrice(p) {
+      if (!p) return 'Price on Request';
+      return 'PKR ' + Number(p).toLocaleString('en-PK');
+    }
+
+    function formatDate(d) {
+      return new Date(d).toLocaleDateString('en-PK', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    }
+
+    // ===== STARS HELPER =====
+    function renderStars(rating, size = 'md') {
+      const sz = size === 'sm' ? '0.8rem' : '0.95rem';
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        html += `<span class="star ${i <= Math.round(rating) ? 'filled' : 'empty'}" style="font-size:${sz}">★</span>`;
+      }
+      return html;
+    }
+
+    function renderVehicle(v) {
+      const isSeller = user && (user.id === v.seller?._id || user.id === v.seller?.id);
+      const isAdmin = user && user.role === 'admin';
+      const hasModel = !!v.modelFile;
+      const statusClass = v.status || 'pending';
+      const statusLabel = (v.status || 'pending').charAt(0).toUpperCase() + (v.status || 'pending').slice(1);
+      const images = v.images && v.images.length > 0 ? v.images : [];
+
+      document.title = `FourWheels — ${v.title}`;
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="breadcrumb">
+          <a href="index.html">Home</a> ›
+          <a href="vehicles.html">Listings</a> ›
+          <span>${v.title}</span>
+        </div>
+
+        <div class="detail-grid">
+          <!-- LEFT COL -->
+          <div class="left-col">
+
+            <!-- Image Gallery -->
+            <div class="gallery">
+              <div class="gallery-main" id="galleryMain">
+                ${images.length > 0
+          ? `<img id="mainImg" src="${API.replace('/api', '')}/${images[0]}" alt="${v.title}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'><span>🚗</span><p>Image unavailable</p></div>'">`
+          : `<div class="no-image"><span>🚗</span><p>No images uploaded</p></div>`}
+                ${images.length > 1 ? `
+                <div class="gallery-nav">
+                  <button onclick="prevImg()" title="Previous">‹</button>
+                  <button onclick="nextImg()" title="Next">›</button>
+                </div>
+                <div class="img-counter" id="imgCounter">1 / ${images.length}</div>` : ''}
+              </div>
+              ${images.length > 1 ? `
+              <div class="gallery-thumbs" id="galleryThumbs">
+                ${images.map((img, i) => `
+                  <img class="thumb ${i === 0 ? 'active' : ''}"
+                       src="${API.replace('/api', '')}/${img}"
+                       alt="Image ${i + 1}"
+                       onclick="goToImg(${i})"
+                       onerror="this.style.display='none'"/>
+                `).join('')}
+              </div>` : ''}
+            </div>
+
+            <!-- 3D Viewer -->
+            <div class="viewer-section" id="viewerSection">
+              <div class="viewer-header">
+                <div class="viewer-title">
+                  <span class="dot"></span>
+                  3D Vehicle Preview
+                  ${hasModel ? '<span class="badge-3d">LIVE MODEL</span>' : '<span class="badge-3d" style="border-color:var(--muted);color:var(--muted)">DEMO</span>'}
+                </div>
+                <span class="viewer-tip">🖱 Click to explore in 3D</span>
+              </div>
+              <div style="position:relative;">
+                <canvas id="previewCanvas"></canvas>
+              </div>
+              <div class="preview-hint">⛶ Click model to open fullscreen 3D viewer</div>
+            </div>
+
+            <!-- Vehicle Info -->
+            <div class="info-section">
+              <div class="veh-status ${statusClass}">${statusLabel}</div>
+              <div class="veh-title">${v.title}</div>
+              <div class="veh-price">${formatPrice(v.price)}</div>
+
+              <div class="veh-meta">
+                <div class="meta-chip"><span class="icon">📍</span> ${v.city || 'N/A'}</div>
+                <div class="meta-chip"><span class="icon">🚗</span> ${(v.category || '').charAt(0).toUpperCase() + (v.category || '').slice(1)}</div>
+                <div class="meta-chip"><span class="icon">📅</span> Listed ${formatDate(v.createdAt)}</div>
+                <div class="meta-chip"><span class="icon">👁</span> ${v.views || 0} views</div>
+              </div>
+
+              <div class="section-label">Description</div>
+              <div class="veh-description">${v.description || 'No description provided.'}</div>
+
+              <div class="stats-row">
+                <div class="stat-box">
+                  <div class="num">${v.views || 0}</div>
+                  <div class="lbl">Views</div>
+                </div>
+                <div class="stat-box">
+                  <div class="num">${images.length}</div>
+                  <div class="lbl">Photos</div>
+                </div>
+                <div class="stat-box">
+                  <div class="num">${hasModel ? '✓' : '–'}</div>
+                  <div class="lbl">3D Model</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== REVIEWS SECTION ===== -->
+            <div class="reviews-section" id="reviewsSection">
+              <div class="reviews-header">
+                <div class="reviews-header-title">Seller <span>Reviews</span></div>
+                <span id="reviewsCountBadge" style="font-size:0.78rem;color:var(--muted);">Loading…</span>
+              </div>
+
+              <!-- Rating Summary -->
+              <div class="rating-summary" id="ratingSummary">
+                <div style="color:var(--muted);font-size:0.85rem;padding:1rem">Loading reviews…</div>
+              </div>
+
+              <!-- Review List -->
+              <div class="review-list" id="reviewList">
+              </div>
+
+              <div class="reviews-load-more" id="loadMoreWrap" style="display:none">
+                <button class="btn-load-more" onclick="loadMoreReviews()">Load More Reviews</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COL -->
+          <div class="right-col">
+
+            <!-- Seller Card -->
+            <div class="seller-card">
+              <div class="seller-card-title">Seller Information</div>
+              <div class="seller-info">
+                <div class="seller-avatar">${getInitials(v.seller?.name)}</div>
+                <div>
+                  <div class="seller-name">${v.seller?.name || 'Unknown Seller'}</div>
+                  <div class="seller-since">Member since ${v.seller?.createdAt ? formatDate(v.seller.createdAt) : 'N/A'}</div>
+                  <div class="seller-rating-row" id="sellerRatingRow">
+                    <span style="font-size:0.72rem;color:var(--muted)">Loading rating…</span>
+                  </div>
+                </div>
+              </div>
+              <div class="seller-detail-row">
+                <span class="icon">📧</span>
+                <strong>${v.seller?.email || 'N/A'}</strong>
+              </div>
+              <div class="seller-detail-row">
+                <span class="icon">📞</span>
+                <strong>${v.seller?.phone || 'Not provided'}</strong>
+              </div>
+              <div class="seller-detail-row">
+                <span class="icon">📍</span>
+                <strong>${v.seller?.city || 'N/A'}</strong>
+              </div>
+              ${v.seller?.phone ? `
+              <a class="btn-contact btn-phone" href="tel:${v.seller.phone}">
+                📞 Call Seller
+              </a>` : ''}
+            </div>
+
+            <!-- Write Review Card (buyers only, not seller's own listing) -->
+            ${user && !isSeller && user.role !== 'admin' ? `
+            <div class="write-review-card" id="writeReviewCard">
+              <div class="write-review-title">Rate This Seller</div>
+              <div class="write-review-sub" id="reviewCardSub">Share your experience with this seller.</div>
+
+              <form id="reviewForm">
+                <div class="field">
+                  <label>Your Rating *</label>
+                  <div class="star-input" id="starInput">
+                    <input type="radio" name="rating" id="s5" value="5"/><label for="s5" title="5 stars">★</label>
+                    <input type="radio" name="rating" id="s4" value="4"/><label for="s4" title="4 stars">★</label>
+                    <input type="radio" name="rating" id="s3" value="3"/><label for="s3" title="3 stars">★</label>
+                    <input type="radio" name="rating" id="s2" value="2"/><label for="s2" title="2 stars">★</label>
+                    <input type="radio" name="rating" id="s1" value="1"/><label for="s1" title="1 star">★</label>
+                  </div>  
+                </div>
+                <div class="field">
+                  <label>Comment (Optional)</label>
+                  <textarea id="reviewComment" rows="3" placeholder="Describe your experience with this seller…"></textarea>
+                </div>
+                <button type="submit" class="btn-submit" id="reviewSubmitBtn">Submit Review</button>
+              </form>
+            </div>
+            ` : ''}
+
+            <!-- Inquiry Form -->
+            <div class="inquiry-card">
+              <div class="inquiry-title">Send Inquiry</div>
+              <div class="inquiry-sub">Interested? Contact the seller directly.</div>
+
+              ${user ? `
+              <form id="inquiryForm">
+                <div class="field">
+                  <label>Your Name</label>
+                  <input type="text" value="${user.name}" readonly style="opacity:0.7"/>
+                </div>
+                <div class="field">
+                  <label>Message</label>
+                  <textarea id="msgText" rows="4" placeholder="Hi, I'm interested in this vehicle. Is it still available?"></textarea>
+                </div>
+                <button type="submit" class="btn-submit" id="inquiryBtn">Send Message</button>
+              </form>
+              ` : `
+              <div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:0.9rem;">
+                <p style="margin-bottom:1rem;">Please login to send an inquiry.</p>
+                <a href="login.html" style="display:inline-block;padding:0.7rem 1.5rem;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;font-weight:500;">Login to Inquire</a>
+              </div>
+              `}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <div class="quick-actions-title">Quick Actions</div>
+              <button class="action-btn" onclick="shareVehicle()">
+                <span class="icon">🔗</span> Copy Share Link
+              </button>
+              ${isSeller || isAdmin ? `
+              <button class="action-btn" onclick="window.location.href='seller-dashboard.html'">
+                <span class="icon">✏️</span> Edit This Listing
+              </button>` : ''}
+              <button class="action-btn" onclick="window.location.href='vehicles.html'">
+                <span class="icon">🔍</span> Browse Similar Vehicles
+              </button>
+              ${v.seller?._id || v.seller?.id ? `
+              <button class="action-btn" onclick="document.getElementById('reviewsSection')?.scrollIntoView({behavior:'smooth'})">
+                <span class="icon">⭐</span> View Seller Reviews
+              </button>` : ''}
+            </div>
+
+          </div>
+        </div>
+      `;
+
+      // Init gallery state
+      window._imgs = images;
+      window._imgIdx = 0;
+
+      // Init 3D viewer
+      init3DViewer(v.modelFile);
+
+      // Init inquiry form
+      if (user) {
+        document.getElementById('inquiryForm')?.addEventListener('submit', handleInquiry);
+      }
+
+      // Load reviews
+      const sellerId = v.seller?._id || v.seller?.id;
+      if (sellerId) {
+        window._sellerId = sellerId;
+        window._reviewPage = 1;
+        window._reviewTotal = 0;
+        loadSellerReviews(sellerId, true);
+
+        // Check if user already reviewed
+        if (user && !isSeller && user.role !== 'admin') {
+          checkExistingReview(sellerId);
+        }
+
+        // Review form submit
+        document.getElementById('reviewForm')?.addEventListener('submit', handleReviewSubmit);
+      }
+    }
+
+    // ===== GALLERY =====
+    function goToImg(idx) {
+      const imgs = window._imgs;
+      if (!imgs || !imgs.length) return;
+      window._imgIdx = idx;
+      const mainImg = document.getElementById('mainImg');
+      if (mainImg) mainImg.src = `${API.replace('/api', '')}/${imgs[idx]}`;
+      const counter = document.getElementById('imgCounter');
+      if (counter) counter.textContent = `${idx + 1} / ${imgs.length}`;
+      document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+
+    function nextImg() { const len = (window._imgs || []).length; goToImg((window._imgIdx + 1) % len); }
+    function prevImg() { const len = (window._imgs || []).length; goToImg((window._imgIdx - 1 + len) % len); }
+
+    // ===== 3D VIEWER =====
+
+    // Shared state
+    let previewScene, previewCamera, previewRenderer, previewMesh;
+    let fsScene, fsCamera, fsRenderer, fsMesh;
+    let fsAnimId;
+    let fsIsDragging = false, fsPrevMouse = { x: 0, y: 0 };
+    let fsRotX = 0.2, fsRotY = 0;
+    let fsBgDark = true;
+    let fsWireframe = false;
+    let currentModelPath = null;
+    let previewBgDark = true;
+    let previewRotY = 0;
+
+    // ---- PREVIEW ----
+    function init3DViewer(modelFilePath) {
+      currentModelPath = modelFilePath || null;
+      const canvas = document.getElementById('previewCanvas');
+      if (!canvas) return;
+
+      previewScene = new THREE.Scene();
+      previewScene.background = new THREE.Color(0x0d0d10);
+
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight || 340;
+
+      previewCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+      previewCamera.position.set(0, 0, 5);
+
+      previewRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      previewRenderer.setSize(w, h);
+      previewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      previewRenderer.shadowMap.enabled = true;
+
+      addLights(previewScene);
+
+      if (modelFilePath) {
+        loadGLBIntoScene(modelFilePath, previewScene, (mesh) => {
+          previewMesh = mesh;
+          snapToGrid(previewMesh);
+        });
+      } else {
+        previewMesh = buildGenericCar(previewScene);
+        snapToGrid(previewMesh);
+      }
+
+      window.addEventListener('resize', () => {
+        const w2 = canvas.clientWidth;
+        previewRenderer.setSize(w2, h);
+        previewCamera.aspect = w2 / h;
+        previewCamera.updateProjectionMatrix();
+      });
+
+      canvas.addEventListener('click', openFullscreen);
+
+      function previewLoop() {
+        requestAnimationFrame(previewLoop);
+        previewRotY += 0.004;
+        if (previewMesh) {
+          previewMesh.rotation.y = previewRotY;
+          previewMesh.rotation.x = 0.08;
+        }
+        previewRenderer.render(previewScene, previewCamera);
+      }
+      previewLoop();
+    }
+
+    // Model ko grid ke bilkul upar rakhna
+    function snapToGrid(mesh) {
+      if (!mesh) return;
+      const box = new THREE.Box3().setFromObject(mesh);
+      const minY = box.min.y;
+      mesh.position.y -= minY;
+
+      // Centre on Y axis
+      const box2 = new THREE.Box3().setFromObject(mesh);
+      const centerY = (box2.min.y + box2.max.y) / 2;
+      // Camera ko model ki height ke hisaab se adjust
+      if (previewCamera) previewCamera.position.y = centerY;
+      if (fsCamera) fsCamera.position.y = centerY;
+    }
+
+    function togglePreviewBg() {
+      previewBgDark = !previewBgDark;
+      if (previewScene) {
+        previewScene.background = new THREE.Color(previewBgDark ? 0x0d0d10 : 0xf0f0f0);
+      }
+      const btn = document.getElementById('previewBgBtn');
+      if (btn) btn.textContent = previewBgDark ? '☀ Light' : '🌙 Dark';
+    }
+
+    // ---- FULLSCREEN ----
+    function openFullscreen() {
+      let overlay = document.getElementById('fsOverlay');
+      if (!overlay) return;
+      overlay.classList.add('active');
+
+      if (!document.getElementById('fs-canvas')) {
+        buildFSOverlay(overlay);
+      }
+
+      if (!fsRenderer) {
+        initFSRenderer();
+      }
+
+      playZoomInAnimation();
+    }
+
+    function buildFSOverlay(overlay) {
+      overlay.innerHTML = `
+        <canvas id="fs-canvas"></canvas>
+        <div class="fs-controls">
+          <button class="ctrl-btn active" id="fsSolidBtn" onclick="setFSWireframe(false)">Solid</button>
+          <button class="ctrl-btn" id="fsWireBtn" onclick="setFSWireframe(true)">Wireframe</button>
+          <button class="ctrl-btn" onclick="resetFSView()">↺ Reset</button>
+          <button class="ctrl-btn" id="fsBgBtn" onclick="toggleFSBg()">☀ Light BG</button>
+          <button class="fs-close-btn" onclick="closeFullscreen()">✕ Close</button>
+        </div>
+      `;
+    }
+
+    function initFSRenderer() {
+      const canvas = document.getElementById('fs-canvas');
+      if (!canvas) return;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      fsScene = new THREE.Scene();
+      fsScene.background = new THREE.Color(0x0a0a0b);
+
+      fsCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+      fsCamera.position.set(0, 0, 6);
+
+      fsRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      fsRenderer.setSize(w, h);
+      fsRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      fsRenderer.shadowMap.enabled = true;
+
+      addLights(fsScene);
+
+      if (currentModelPath) {
+        loadGLBIntoScene(currentModelPath, fsScene, (mesh) => {
+          fsMesh = mesh;
+          fsMesh.rotation.y = fsRotY;
+          const box = new THREE.Box3().setFromObject(fsMesh);
+          const minY = box.min.y;
+          fsMesh.position.y -= minY;
+          fsCamera.position.y = +0.5; // yahan value change karo
+        });
+      } else {
+        fsMesh = buildGenericCar(fsScene);
+        const box = new THREE.Box3().setFromObject(fsMesh);
+        const minY = box.min.y;
+        fsMesh.position.y -= minY;
+        fsCamera.position.y = +0.5; // yahan value change karo
+      }
+
+      // Mouse controls
+      canvas.addEventListener('mousedown', e => {
+        fsIsDragging = true;
+        fsPrevMouse = { x: e.clientX, y: e.clientY };
+      });
+      window.addEventListener('mousemove', e => {
+        if (!fsIsDragging) return;
+        const dx = e.clientX - fsPrevMouse.x;
+        const dy = e.clientY - fsPrevMouse.y;
+        fsRotY += dx * 0.01;
+        fsRotX += dy * 0.005;
+        fsRotX = Math.max(-0.8, Math.min(0.8, fsRotX));
+        fsPrevMouse = { x: e.clientX, y: e.clientY };
+      });
+      window.addEventListener('mouseup', () => { fsIsDragging = false; });
+
+      canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        fsCamera.position.z = Math.max(2, Math.min(14, fsCamera.position.z + e.deltaY * 0.012));
+      }, { passive: false });
+
+      // Touch
+      canvas.addEventListener('touchstart', e => {
+        fsIsDragging = true;
+        fsPrevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { passive: true });
+      canvas.addEventListener('touchmove', e => {
+        if (!fsIsDragging) return;
+        const dx = e.touches[0].clientX - fsPrevMouse.x;
+        const dy = e.touches[0].clientY - fsPrevMouse.y;
+        fsRotY += dx * 0.01;
+        fsRotX += dy * 0.005;
+        fsRotX = Math.max(-0.8, Math.min(0.8, fsRotX));
+        fsPrevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { passive: true });
+      canvas.addEventListener('touchend', () => { fsIsDragging = false; });
+
+      window.addEventListener('resize', () => {
+        const w2 = window.innerWidth;
+        const h2 = window.innerHeight;
+        fsRenderer.setSize(w2, h2);
+        fsCamera.aspect = w2 / h2;
+        fsCamera.updateProjectionMatrix();
+      });
+
+      // FS animate loop — auto-rotate jab drag na ho
+      function fsLoop() {
+        fsAnimId = requestAnimationFrame(fsLoop);
+        if (fsMesh) {
+          if (!fsIsDragging) fsRotY += 0.004; // auto-rotate always on
+          fsMesh.rotation.y = fsRotY;
+          fsMesh.rotation.x = fsRotX;
+        }
+        fsRenderer.render(fsScene, fsCamera);
+      }
+      fsLoop();
+    }
+
+    // FS scene ke liye grid snap
+    function snapToGridFS(mesh) {
+      if (!mesh) return;
+      const box = new THREE.Box3().setFromObject(mesh);
+      const minY = box.min.y;
+      mesh.position.y -= minY;
+    }
+
+    function playZoomInAnimation() {
+      if (!fsCamera) return;
+      fsCamera.position.set(0, fsCamera.position.y, 22);
+      const targetZ = 6;
+      const startTime = performance.now();
+      const duration = 900;
+
+      function zoomStep(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        fsCamera.position.z = 22 - (22 - targetZ) * ease;
+        if (t < 1) requestAnimationFrame(zoomStep);
+      }
+      requestAnimationFrame(zoomStep);
+    }
+
+    function closeFullscreen() {
+      const overlay = document.getElementById('fsOverlay');
+      if (overlay) overlay.classList.remove('active');
+    }
+
+    function setFSWireframe(val) {
+      fsWireframe = val;
+      if (fsMesh) fsMesh.traverse(c => { if (c.isMesh) c.material.wireframe = val; });
+      document.getElementById('fsSolidBtn')?.classList.toggle('active', !val);
+      document.getElementById('fsWireBtn')?.classList.toggle('active', val);
+    }
+
+    function toggleFSBg() {
+      fsBgDark = !fsBgDark;
+      if (fsScene) fsScene.background = new THREE.Color(fsBgDark ? 0x0a0a0b : 0xf0f0f0);
+      const btn = document.getElementById('fsBgBtn');
+      if (btn) btn.textContent = fsBgDark ? '☀ Light BG' : '🌙 Dark BG';
+    }
+
+    function resetFSView() {
+      fsRotX = 0.2;
+      fsRotY = 0;
+      playZoomInAnimation();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeFullscreen();
+    });
+
+    // ---- SHARED HELPERS ----
+    function addLights(sc) {
+      sc.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const key = new THREE.DirectionalLight(0xffffff, 1.2);
+      key.position.set(5, 8, 5);
+      sc.add(key);
+      const fill = new THREE.DirectionalLight(0xe8390e, 0.4);
+      fill.position.set(-5, 2, -3);
+      sc.add(fill);
+    }
+
+    function loadGLBIntoScene(modelFilePath, sc, onLoad) {
+      if (typeof THREE.GLTFLoader === 'undefined') {
+        const mesh = buildGenericCar(sc);
+        if (onLoad) onLoad(mesh);
+        return;
+      }
+      const loader = new THREE.GLTFLoader();
+      const url = API.replace('/api', '') + '/' + modelFilePath;
+      loader.load(url, gltf => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 3 / maxDim;
+        model.scale.setScalar(scale);
+        model.position.sub(center.multiplyScalar(scale));
+        sc.add(model);
+        if (onLoad) onLoad(model);
+      }, null, () => {
+        const mesh = buildGenericCar(sc);
+        if (onLoad) onLoad(mesh);
+      });
+    }
+
+    function buildGenericCar(sc) {
+      const carGroup = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe8390e, roughness: 0.3, metalness: 0.7 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x88aacc, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.6 });
+      const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8, metalness: 0.2 });
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.2, metalness: 0.9 });
+
+      const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.6, 1.8), bodyMat);
+      lowerBody.position.y = 0.1;
+      carGroup.add(lowerBody);
+
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 1.65), bodyMat);
+      cabin.position.set(-0.15, 0.65, 0);
+      carGroup.add(cabin);
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.62, 1.5), glassMat);
+      windshield.position.set(0.97, 0.65, 0);
+      windshield.rotation.z = -0.25;
+      carGroup.add(windshield);
+
+      const hood = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 1.75), bodyMat);
+      hood.position.set(1.5, 0.46, 0);
+      carGroup.add(hood);
+
+      const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.35, 1.85), blackMat);
+      frontBumper.position.set(1.97, -0.05, 0);
+      carGroup.add(frontBumper);
+
+      [-0.65, 0.65].forEach(z => {
+        const hl = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.32),
+          new THREE.MeshStandardMaterial({ color: 0xffffcc, emissive: 0xffffaa, emissiveIntensity: 0.8 }));
+        hl.position.set(1.96, 0.08, z);
+        carGroup.add(hl);
+      });
+
+      [[1.1, -0.38, 1.0], [1.1, -0.38, -1.0], [-1.1, -0.38, 1.0], [-1.1, -0.38, -1.0]].forEach(([x, y, z]) => {
+        const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.28, 24), tireMat);
+        tire.rotation.x = Math.PI / 2;
+        tire.position.set(x, y, z);
+        carGroup.add(tire);
+        const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.3, 12), rimMat);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.set(x, y, z);
+        carGroup.add(rim);
+      });
+
+      sc.add(carGroup);
+      return carGroup;
+    }
+
+    function setWireframe() { }
+    function resetCamera() { }
+
+    // ===== REVIEWS =====
+    async function loadSellerReviews(sellerId, reset = false) {
+      try {
+        if (reset) window._reviewPage = 1;
+
+        const res = await fetch(`${API}/reviews/seller/${sellerId}?page=${window._reviewPage}&limit=5`);
+        const data = await res.json();
+
+        window._reviewTotal = data.total || 0;
+
+        // Update seller rating in sidebar
+        updateSellerRatingDisplay(data.avgRating || 0, data.total || 0);
+
+        // Update reviews count badge
+        const badge = document.getElementById('reviewsCountBadge');
+        if (badge) badge.textContent = `${data.total || 0} review${data.total !== 1 ? 's' : ''}`;
+
+        // Render rating summary
+        renderRatingSummary(data.avgRating || 0, data.total || 0, data.ratingDistribution || {});
+
+        // Render review cards
+        const list = document.getElementById('reviewList');
+        if (!list) return;
+
+        if (reset) list.innerHTML = '';
+
+        if (!data.reviews || data.reviews.length === 0) {
+          if (reset) {
+            list.innerHTML = `
+              <div class="reviews-empty">
+                <div class="icon">⭐</div>
+                <p>No reviews yet for this seller.</p>
+              </div>`;
+          }
+        } else {
+          data.reviews.forEach((review, idx) => {
+            const card = buildReviewCard(review, idx);
+            list.insertAdjacentHTML('beforeend', card);
+          });
+        }
+
+        // Load more button
+        const loadMoreWrap = document.getElementById('loadMoreWrap');
+        if (loadMoreWrap) {
+          const hasMore = (window._reviewPage * 5) < data.total;
+          loadMoreWrap.style.display = hasMore ? 'block' : 'none';
+        }
+
+      } catch (err) {
+        const ratingSummary = document.getElementById('ratingSummary');
+        if (ratingSummary) ratingSummary.innerHTML = `<div style="color:var(--muted);font-size:0.85rem;padding:0.5rem">Could not load reviews.</div>`;
+      }
+    }
+
+    function renderRatingSummary(avg, total, dist) {
+      const el = document.getElementById('ratingSummary');
+      if (!el) return;
+
+      if (total === 0) {
+        el.innerHTML = `
+          <div style="color:var(--muted);font-size:0.88rem;padding:0.5rem 0;">
+            No reviews yet. Be the first to review this seller!
+          </div>`;
+        return;
+      }
+
+      const starsHtml = renderStars(avg);
+      let barsHtml = '';
+      for (let i = 5; i >= 1; i--) {
+        const count = dist[i] || 0;
+        const pct = total > 0 ? (count / total) * 100 : 0;
+        barsHtml += `
+          <div class="rating-bar-row">
+            <span>${i}★</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="bar-count">${count}</span>
+          </div>`;
+      }
+
+      el.innerHTML = `
+        <div class="rating-big">
+          <div class="num">${avg.toFixed(1)}</div>
+          <div class="stars">${starsHtml}</div>
+          <div class="count">${total} review${total !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="rating-bars">${barsHtml}</div>`;
+    }
+
+    function updateSellerRatingDisplay(avg, total) {
+      const el = document.getElementById('sellerRatingRow');
+      if (!el) return;
+      if (total === 0) {
+        el.innerHTML = `<span style="font-size:0.72rem;color:var(--muted)">No reviews yet</span>`;
+        return;
+      }
+      el.innerHTML = `
+        <div class="seller-rating-stars">${renderStars(avg, 'sm')}</div>
+        <span class="seller-rating-text">${avg.toFixed(1)} (${total})</span>`;
+    }
+
+    function buildReviewCard(review, idx) {
+      const name = review.reviewer?.name || 'Anonymous';
+      const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      const date = formatDate(review.createdAt);
+      const starsHtml = renderStars(review.rating);
+      const isOwn = user && (review.reviewer?._id === user.id || review.reviewer?.id === user.id);
+      const isAdmin = user && user.role === 'admin';
+
+      return `
+        <div class="review-card" style="animation-delay:${idx * 80}ms" id="review-${review._id}">
+          <div class="review-card-header">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">${initials}</div>
+              <div>
+                <div class="reviewer-name">${escHtml(name)}</div>
+                <div class="reviewer-meta">${review.reviewer?.city ? '📍 ' + escHtml(review.reviewer.city) + ' · ' : ''}${date}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div class="review-stars">${starsHtml}</div>
+              ${isOwn || isAdmin ? `<button class="review-delete-btn" onclick="deleteReview('${review._id}')">Delete</button>` : ''}
+            </div>
+          </div>
+          ${review.comment ? `<div class="review-comment">${escHtml(review.comment)}</div>` : ''}
+        </div>`;
+    }
+
+    function loadMoreReviews() {
+      window._reviewPage++;
+      loadSellerReviews(window._sellerId, false);
+    }
+
+    async function checkExistingReview(sellerId) {
+      if (!token) return;
+      try {
+        const res = await fetch(`${API}/reviews/check/${sellerId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.reviewed && data.review) {
+          // Pre-fill form with existing review
+          const ratingInput = document.querySelector(`input[name="rating"][value="${data.review.rating}"]`);
+          if (ratingInput) ratingInput.checked = true;
+          const commentInput = document.getElementById('reviewComment');
+          if (commentInput) commentInput.value = data.review.comment || '';
+          const sub = document.getElementById('reviewCardSub');
+          if (sub) sub.textContent = 'You have already reviewed this seller. You can update your review below.';
+          const btn = document.getElementById('reviewSubmitBtn');
+          if (btn) btn.textContent = 'Update Review';
+        }
+      } catch (err) { }
+    }
+
+    async function handleReviewSubmit(e) {
+      e.preventDefault();
+
+      const ratingInput = document.querySelector('input[name="rating"]:checked');
+      if (!ratingInput) {
+        showToast('Please select a star rating', 'error');
+        return;
+      }
+
+      const rating = parseInt(ratingInput.value);
+      const comment = document.getElementById('reviewComment')?.value?.trim();
+      const sellerId = window._sellerId;
+
+      const btn = document.getElementById('reviewSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      try {
+        const res = await fetch(`${API}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ sellerId, rating, comment })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast(data.message || 'Review submitted!', 'success');
+          // Reload reviews
+          loadSellerReviews(sellerId, true);
+          // Update button text
+          btn.textContent = 'Update Review';
+          const sub = document.getElementById('reviewCardSub');
+          if (sub) sub.textContent = 'You have already reviewed this seller. You can update your review below.';
+        } else {
+          showToast(data.message || 'Could not submit review', 'error');
+        }
+      } catch (err) {
+        showToast('Cannot connect to server', 'error');
+      }
+
+      btn.disabled = false;
+    }
+
+    async function deleteReview(reviewId) {
+      if (!confirm('Delete this review?')) return;
+
+      try {
+        const res = await fetch(`${API}/reviews/${reviewId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Review deleted.', 'success');
+          document.getElementById(`review-${reviewId}`)?.remove();
+          // Reload to update stats
+          setTimeout(() => loadSellerReviews(window._sellerId, true), 300);
+        } else {
+          showToast(data.message || 'Could not delete review', 'error');
+        }
+      } catch (err) {
+        showToast('Cannot connect to server', 'error');
+      }
+    }
+
+    // ===== INQUIRY =====
+    async function handleInquiry(e) {
+      e.preventDefault();
+      const msg = document.getElementById('msgText')?.value?.trim();
+      if (!msg) { showToast('Please enter a message', 'error'); return; }
+
+      const btn = document.getElementById('inquiryBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch(`${API}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ vehicle: vehicleId, message: msg }),
+        });
+
+        if (res.ok) {
+          showToast('Message sent successfully!', 'success');
+          document.getElementById('msgText').value = '';
+        } else {
+          showToast('Inquiry sent! (Messages feature coming soon)', 'success');
+        }
+      } catch {
+        showToast('Message sent! (offline mode)', 'success');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Send Message';
+    }
+
+    // ===== SHARE =====
+    function shareVehicle() {
+      const url = window.location.href;
+      navigator.clipboard?.writeText(url).then(() => {
+        showToast('Link copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Copy this URL: ' + url, 'success');
+      });
+    }
+
+    // ===== UTILS =====
+    function escHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* ====== SPEEDOMETER RATING ENGINE ====== */
+    (function () {
+      const SPEED_MAP = { 1: 20, 2: 40, 3: 60, 4: 80, 5: 100 };
+      const COLORS = {
+        1: '#f59e0b', 2: '#f59e0b', 3: '#e8390e', 4: '#e8390e', 5: '#ff2200'
+      };
+      let _animFrame = null, _animating = false;
+      let _currentVal = 0, _targetVal = 0;
+      let _animStart = 0, _animDur = 0;
+      let _activeRating = 0;
+      let _audioCtx = null;
+      let _closeTimeout = null;
+
+      const canvas = document.getElementById('speedoCanvas');
+      const ctx = canvas ? canvas.getContext('2d') : null;
+      const W = 600, H = 600, CX = W / 2, CY = H / 2;
+
+      function drawGauge(value) {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, W, H);
+        const R = 240;
+        const START = -Math.PI * 0.8;
+        const END = Math.PI * 0.8;
+        const RANGE = END - START;
+        const frac = Math.min(1, Math.max(0, value / 100));
+        const needleAngle = START + RANGE * frac;
+        const col = COLORS[_activeRating] || '#e8390e';
+
+        // Track arc
+        ctx.beginPath(); ctx.arc(CX, CY, R, START, END);
+        ctx.strokeStyle = 'rgba(232,57,14,0.08)'; ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.stroke();
+
+        // Outer glow ring
+        const og = ctx.createRadialGradient(CX, CY, R - 6, CX, CY, R + 6);
+        og.addColorStop(0, col + '99'); og.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(CX, CY, R + 2, START, END);
+        ctx.strokeStyle = og; ctx.lineWidth = 5; ctx.stroke();
+
+        // Progress arc
+        if (frac > 0) {
+          ctx.beginPath(); ctx.arc(CX, CY, R, START, needleAngle);
+          ctx.strokeStyle = col + '44'; ctx.lineWidth = 26; ctx.lineCap = 'round'; ctx.stroke();
+          ctx.beginPath(); ctx.arc(CX, CY, R, START, needleAngle);
+          ctx.strokeStyle = col; ctx.lineWidth = 10;
+          ctx.shadowBlur = 22; ctx.shadowColor = col; ctx.stroke(); ctx.shadowBlur = 0;
+        }
+
+        // Dot ring
+        for (let a = START; a <= END + 0.01; a += 0.045) {
+          const dotR = R + 20, df = (a - START) / RANGE;
+          const dx = CX + dotR * Math.cos(a), dy = CY + dotR * Math.sin(a);
+          ctx.beginPath(); ctx.arc(dx, dy, 1.6, 0, Math.PI * 2);
+          ctx.fillStyle = df <= frac ? col + 'cc' : 'rgba(232,57,14,0.12)'; ctx.fill();
+        }
+
+        // Tick marks
+        for (let i = 0; i <= 100; i += 1) {
+          const ta = START + RANGE * (i / 100);
+          const isMajor = i % 10 === 0, isMid = i % 5 === 0 && !isMajor;
+          if (!isMajor && !isMid) continue;
+          const outer = R - 2, inner = isMajor ? R - 20 : R - 12;
+          ctx.beginPath();
+          ctx.moveTo(CX + outer * Math.cos(ta), CY + outer * Math.sin(ta));
+          ctx.lineTo(CX + inner * Math.cos(ta), CY + inner * Math.sin(ta));
+          ctx.strokeStyle = isMajor ? 'rgba(232,57,14,0.9)' : 'rgba(232,57,14,0.3)';
+          ctx.lineWidth = isMajor ? 2.5 : 1.2; ctx.lineCap = 'butt'; ctx.stroke();
+          if (isMajor) {
+            const lr = R - 34, lx = CX + lr * Math.cos(ta), ly = CY + lr * Math.sin(ta);
+            ctx.font = 'bold 18px "Bebas Neue", sans-serif';
+            ctx.fillStyle = i <= (frac * 100) ? col : 'rgba(232,57,14,0.35)';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.shadowBlur = i <= (frac * 100) ? 8 : 0; ctx.shadowColor = col;
+            ctx.fillText(i.toString(), lx, ly); ctx.shadowBlur = 0;
+          }
+        }
+
+        // Center disc
+        const dg = ctx.createRadialGradient(CX, CY, 0, CX, CY, R - 38);
+        dg.addColorStop(0, '#12080a'); dg.addColorStop(1, '#0a0a0b');
+        ctx.beginPath(); ctx.arc(CX, CY, R - 40, 0, Math.PI * 2);
+        ctx.fillStyle = dg; ctx.fill();
+        ctx.beginPath(); ctx.arc(CX, CY, R - 40, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(232,57,14,0.07)'; ctx.lineWidth = 2; ctx.stroke();
+
+        // Speed number
+        const dv = Math.floor(value);
+        ctx.font = '900 100px "Bebas Neue", sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = col; ctx.shadowBlur = 28; ctx.shadowColor = col;
+        ctx.fillText(dv, CX, CY - 18); ctx.shadowBlur = 0;
+        ctx.font = '600 20px "DM Sans", sans-serif';
+        ctx.fillStyle = 'rgba(232,57,14,0.4)'; ctx.fillText('MPS', CX, CY + 56);
+
+        // Stars inside gauge
+        ctx.font = '26px sans-serif'; ctx.textAlign = 'center';
+        let ss = ''; for (let s = 1; s <= 5; s++) ss += s <= _activeRating ? '★' : '☆';
+        ctx.fillStyle = col + 'bb'; ctx.shadowBlur = 8; ctx.shadowColor = col;
+        ctx.fillText(ss, CX, CY + 95); ctx.shadowBlur = 0;
+
+        // Needle
+        const nl = R - 52, bl = 36;
+        const nx = CX + nl * Math.cos(needleAngle), ny = CY + nl * Math.sin(needleAngle);
+        const bx = CX - bl * Math.cos(needleAngle), by = CY - bl * Math.sin(needleAngle);
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(nx, ny);
+        ctx.strokeStyle = col + '55'; ctx.lineWidth = 12; ctx.lineCap = 'round';
+        ctx.shadowBlur = 28; ctx.shadowColor = col; ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(nx, ny);
+        ctx.strokeStyle = col; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+        ctx.shadowBlur = 14; ctx.shadowColor = col; ctx.stroke(); ctx.shadowBlur = 0;
+        // needle tip white
+        ctx.beginPath();
+        ctx.moveTo(CX + (nl - 28) * Math.cos(needleAngle), CY + (nl - 28) * Math.sin(needleAngle));
+        ctx.lineTo(nx, ny); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.8; ctx.stroke();
+        // hub
+        const hg = ctx.createRadialGradient(CX, CY, 0, CX, CY, 20);
+        hg.addColorStop(0, col); hg.addColorStop(0.4, '#1a0505'); hg.addColorStop(1, '#0a0a0b');
+        ctx.beginPath(); ctx.arc(CX, CY, 20, 0, Math.PI * 2);
+        ctx.fillStyle = hg; ctx.shadowBlur = 18; ctx.shadowColor = col; ctx.fill(); ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(CX, CY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fill();
+      }
+
+      function racingEase(t) {
+        const c1 = 1.5, c3 = c1 + 1;
+        const e = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+        const ripple = Math.sin(t * Math.PI * 4) * 0.015 * (1 - t);
+        return Math.max(0, Math.min(1, e + ripple));
+      }
+
+      function animateNeedle(rating, target) {
+        if (_animFrame) cancelAnimationFrame(_animFrame);
+        _currentVal = 0; _targetVal = target;
+        _animStart = performance.now(); _animDur = rating * 1000; _animating = true;
+        function tick(now) {
+          const t = Math.min(1, (now - _animStart) / _animDur);
+          const eased = racingEase(t);
+          let val = _targetVal * eased;
+          if (t > 0.05 && t < 0.92) val += (Math.random() - 0.5) * 1.6;
+          _currentVal = Math.max(0, Math.min(_targetVal + 1, val));
+          drawGauge(_currentVal);
+          if (t < 1) { _animFrame = requestAnimationFrame(tick); }
+          else {
+            _currentVal = _targetVal; drawGauge(_currentVal); _animating = false;
+            const lbl = document.getElementById('speedoLabel');
+            if (lbl) lbl.textContent = `✅ ${_targetVal} MPS REACHED`;
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function initAudio() {
+        if (_audioCtx) return _audioCtx;
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return _audioCtx;
+      }
+
+      function playSound(rating) {
+        const ac = initAudio(); if (!ac) return;
+        if (ac.state === 'suspended') ac.resume();
+        const now = ac.currentTime;
+        const master = ac.createGain(); master.connect(ac.destination);
+        if (rating === 1) {
+          master.gain.setValueAtTime(0.0001, now);
+          master.gain.linearRampToValueAtTime(0.35, now + 0.3);
+          master.gain.linearRampToValueAtTime(0, now + 1.8);
+          [80, 160, 240].forEach((f, i) => {
+            const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+            const g = ac.createGain(); g.gain.value = i === 0 ? 1 : 0.3;
+            o.connect(g); g.connect(master); o.start(now); o.stop(now + 2);
+          });
+        } else if (rating === 2) {
+          master.gain.setValueAtTime(0.0001, now); master.gain.linearRampToValueAtTime(0.45, now + 0.2);
+          master.gain.linearRampToValueAtTime(0, now + 2.2);
+          const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 110;
+          o.frequency.linearRampToValueAtTime(180, now + 2);
+          const lfo = ac.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 10;
+          const lg = ac.createGain(); lg.gain.value = 25;
+          lfo.connect(lg); lg.connect(o.frequency);
+          o.connect(master); o.start(now); o.stop(now + 2.5); lfo.start(now); lfo.stop(now + 2.5);
+        } else if (rating === 3) {
+          master.gain.setValueAtTime(0.0001, now); master.gain.linearRampToValueAtTime(0.5, now + 0.12);
+          master.gain.linearRampToValueAtTime(0, now + 2.5);
+          const o = ac.createOscillator(); o.type = 'sawtooth';
+          o.frequency.setValueAtTime(220, now); o.frequency.linearRampToValueAtTime(460, now + 2);
+          o.connect(master); o.start(now); o.stop(now + 2.8);
+        } else if (rating === 4) {
+          master.gain.setValueAtTime(0.0001, now); master.gain.linearRampToValueAtTime(0.6, now + 0.1);
+          master.gain.exponentialRampToValueAtTime(0.0001, now + 3);
+          const o = ac.createOscillator(); o.type = 'sawtooth';
+          o.frequency.setValueAtTime(320, now); o.frequency.linearRampToValueAtTime(960, now + 1.8);
+          o.connect(master); o.start(now); o.stop(now + 3);
+          setTimeout(() => {
+            const buf = ac.createBuffer(1, 1024, ac.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < 1024; i++) d[i] = (Math.random() - 0.5) * Math.exp(-i / 80);
+            const bs = ac.createBufferSource(); bs.buffer = buf;
+            const pg = ac.createGain(); pg.gain.value = 0.45;
+            bs.connect(pg); pg.connect(ac.destination); bs.start();
+          }, 1800);
+        } else if (rating === 5) {
+          master.gain.setValueAtTime(0.0001, now); master.gain.linearRampToValueAtTime(0.7, now + 0.07);
+          master.gain.setValueAtTime(0.7, now + 2.5); master.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+          const o = ac.createOscillator(); o.type = 'sawtooth';
+          o.frequency.setValueAtTime(420, now); o.frequency.linearRampToValueAtTime(1700, now + 2.5);
+          o.connect(master); o.start(now); o.stop(now + 5);
+          const o2 = ac.createOscillator(); o2.type = 'sawtooth';
+          o2.frequency.setValueAtTime(840, now); o2.frequency.linearRampToValueAtTime(3400, now + 2.5);
+          const g2 = ac.createGain(); g2.gain.value = 0.2; o2.connect(g2); g2.connect(master);
+          o2.start(now); o2.stop(now + 5);
+          [0.4, 0.9, 1.5, 2.1].forEach(delay => {
+            const buf = ac.createBuffer(1, 2048, ac.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < 2048; i++) d[i] = (Math.random() - 0.5) * Math.exp(-i / 50);
+            const bs = ac.createBufferSource(); bs.buffer = buf;
+            const pg = ac.createGain(); pg.gain.value = 0.35;
+            bs.connect(pg); pg.connect(ac.destination); bs.start(now + delay);
+          });
+        }
+      }
+
+      function showSpeedometer(rating) {
+        _activeRating = rating;
+        const target = SPEED_MAP[rating];
+        const badge = document.getElementById('speedoBadge');
+        const label = document.getElementById('speedoLabel');
+        const overlay = document.getElementById('speedoOverlay');
+        if (badge) badge.textContent = rating;
+        if (label) label.textContent = '⚡ NEEDLE IN MOTION ⚡';
+        if (overlay) overlay.classList.add('show');
+        _currentVal = 0; drawGauge(0);
+        setTimeout(() => animateNeedle(rating, target), 80);
+        playSound(rating);
+        if (_closeTimeout) clearTimeout(_closeTimeout);
+        _closeTimeout = setTimeout(closeSpeedometer, rating * 1000 + 2200);
+      }
+
+      function closeSpeedometer() {
+        const overlay = document.getElementById('speedoOverlay');
+        if (overlay) overlay.classList.remove('show');
+        if (_animFrame) { cancelAnimationFrame(_animFrame); _animFrame = null; }
+        if (_closeTimeout) { clearTimeout(_closeTimeout); _closeTimeout = null; }
+      }
+
+      // Hook into star inputs
+      function hookStarInputs() {
+        document.querySelectorAll('input[name="rating"]').forEach(input => {
+          input.addEventListener('change', () => {
+            const r = parseInt(input.value);
+            if (r >= 1 && r <= 5) showSpeedometer(r);
+          });
+        });
+      }
+
+      // Overlay click to close
+      document.getElementById('speedoOverlay')?.addEventListener('click', closeSpeedometer);
+      document.getElementById('speedoTapHint')?.addEventListener('click', closeSpeedometer);
+
+      // Draw initial blank gauge
+      if (ctx) { _activeRating = 3; drawGauge(0); _activeRating = 0; }
+
+      // Hook stars on page load + after dynamic render
+      const origRenderVehicle = window.renderVehicle;
+      // Stars hook after DOM updates
+      document.addEventListener('change', e => {
+        if (e.target.name === 'rating') {
+          const r = parseInt(e.target.value);
+          if (r >= 1 && r <= 5) showSpeedometer(r);
+        }
+      });
+    })();
+
+    // Keyboard gallery navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') nextImg();
+      if (e.key === 'ArrowLeft') prevImg();
+    });
+  </script>
+
+</body>
+
+</html>

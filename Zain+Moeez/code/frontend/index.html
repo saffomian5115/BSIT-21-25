@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FourWheels — Pakistan's Vehicle Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --card: #18181c;
+      --card-hover: #1f1f25;
+      --border: #2a2a30;
+      --accent: #e8390e;
+      --accent-glow: rgba(232,57,14,0.25);
+      --accent-dim: rgba(232,57,14,0.08);
+      --text: #f0f0f0;
+      --muted: #6b6b75;
+      --input-bg: #0f0f12;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: rgba(10,10,11,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-ghost {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+    .btn-accent {
+      padding: 0.5rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-accent:hover {
+      background: #c72e08;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding-top: 64px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 65% 50%, rgba(232,57,14,0.12) 0%, transparent 65%),
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(42,42,48,0.4) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(42,42,48,0.4) 60px);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,57,14,0.3);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title .accent { color: var(--accent); }
+
+    .hero-title .outline {
+      -webkit-text-stroke: 1px var(--text);
+      color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-hero:hover {
+      background: #c72e08;
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-hero-ghost {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-hero-ghost:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .hero-stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+
+    /* Hero right — floating cards */
+    .hero-visual {
+      position: relative;
+      height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-car {
+      font-size: 9rem;
+      filter: drop-shadow(0 16px 48px rgba(232,57,14,0.5));
+      animation: floatCar 4s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes floatCar {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-18px) rotate(2deg); }
+    }
+
+    .hero-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(232,57,14,0.15);
+      animation: spin 20s linear infinite;
+    }
+
+    .hero-ring:nth-child(2) { width: 300px; height: 300px; }
+    .hero-ring:nth-child(3) { width: 400px; height: 400px; animation-direction: reverse; animation-duration: 30s; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .floating-tag {
+      position: absolute;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      z-index: 3;
+      animation: floatTag 5s ease-in-out infinite;
+      backdrop-filter: blur(8px);
+    }
+
+    .floating-tag:nth-child(4) { top: 20%; left: -10%; animation-delay: 0s; }
+    .floating-tag:nth-child(5) { bottom: 20%; right: -10%; animation-delay: 1.5s; }
+    .floating-tag:nth-child(6) { top: 60%; left: 5%; animation-delay: 0.8s; }
+
+    @keyframes floatTag {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .floating-tag .tag-icon { font-size: 1rem; margin-right: 0.4rem; }
+    .floating-tag .tag-label { color: var(--muted); font-size: 0.7rem; display: block; margin-top: 0.1rem; }
+
+    /* ===== SEARCH BAR ===== */
+    .search-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+    }
+
+    .search-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .search-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .search-field {
+      flex: 1;
+      min-width: 160px;
+      position: relative;
+    }
+
+    .search-field input,
+    .search-field select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1.1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    .search-field input:focus,
+    .search-field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-field input::placeholder { color: var(--muted); }
+
+    .search-field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b75' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+    }
+
+    .search-field select option { background: var(--card); }
+
+    .btn-search {
+      padding: 0.8rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-search:hover {
+      background: #c72e08;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    /* ===== CATEGORIES ===== */
+    .categories-section {
+      padding: 4rem 2.5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .section-title span { color: var(--accent); }
+
+    .section-link {
+      font-size: 0.82rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: gap 0.2s;
+    }
+
+    .section-link:hover { gap: 0.6rem; }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .category-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .category-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--accent-dim);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .category-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .category-card:hover::before { opacity: 1; }
+
+    .cat-icon {
+      font-size: 3rem;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 4px 12px rgba(232,57,14,0.3));
+    }
+
+    .cat-info { position: relative; z-index: 1; }
+
+    .cat-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .cat-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ===== VEHICLES SECTION ===== */
+    .vehicles-section {
+      padding: 2rem 2.5rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .vehicles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .vehicle-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .vehicle-card:hover {
+      border-color: rgba(232,57,14,0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-img-placeholder {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--card) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: var(--muted);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-img-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.015) 20px, rgba(255,255,255,0.015) 40px);
+    }
+
+    .card-img-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 1.1rem 1.25rem 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-category {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .card-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .card-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+
+    .card-price small {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0;
+      display: block;
+      line-height: 1;
+    }
+
+    .card-view-btn {
+      width: 34px; height: 34px;
+      border-radius: 6px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,57,14,0.3);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: background 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .card-view-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Skeleton loader */
+    .skeleton {
+      background: linear-gradient(90deg, var(--card) 25%, var(--surface) 50%, var(--card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--muted);
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--text); margin-bottom: 0.5rem; }
+    .empty-desc { font-size: 0.9rem; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      top: 5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      padding: 0.9rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s;
+      max-width: 300px;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.error { border-left-color: #e83e3e; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    .footer-logo span { color: var(--accent); }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ===== HAMBURGER ===== */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .hero-content { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .categories-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1.25rem; }
+      .hero-content { padding: 0 1.25rem; }
+      .search-section { padding: 1.5rem 1.25rem; }
+      .search-bar { flex-direction: column; }
+      .categories-section,
+      .vehicles-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+      footer { padding: 1.5rem 1.25rem; flex-direction: column; text-align: center; }
+      .hero-stats { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="nav-logo">Four<span>Wheels</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="vehicles.html">Browse</a></li>
+      <li><a href="#" id="navDashLink" style="display:none">Dashboard</a></li>
+    </ul>
+    <div class="nav-actions" id="navActions">
+      <!-- Filled by JS -->
+    </div>
+    <div class="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Pakistan's #1 Auto Marketplace
+        </div>
+        <h1 class="hero-title">
+          Find Your<br>
+          Perfect <span class="accent">Ride</span><br>
+          <span class="outline">Today</span>
+        </h1>
+        <p class="hero-desc">
+          Browse thousands of verified cars, bikes & trucks from trusted sellers across Pakistan.
+          Real prices, real sellers, no middlemen.
+        </p>
+        <div class="hero-cta">
+          <a href="vehicles.html" class="btn-hero">Browse All Vehicles →</a>
+          <a href="register.html" class="btn-hero-ghost" id="heroRegisterBtn">List Your Vehicle</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num" id="statListings">5K+</div>
+            <div class="hero-stat-label">Listings</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">12K+</div>
+            <div class="hero-stat-label">Happy Users</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">50+</div>
+            <div class="hero-stat-label">Cities</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-car">🚗</div>
+        <div class="floating-tag">
+          <span class="tag-icon">✅</span> Verified Sellers
+          <span class="tag-label">Across Pakistan</span>
+        </div>
+        <div class="floating-tag">
+          <span class="tag-icon">📦</span> 3D View Available
+          <span class="tag-label">On Select Listings</span>
+        </div>
+        <div class="floating-tag">
+          <span class="tag-icon">💬</span> Direct Messaging
+          <span class="tag-label">No Middlemen</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="search-section" id="searchSection">
+    <div class="search-inner">
+      <div class="search-label">🔍 Quick Search</div>
+      <div class="search-bar">
+
+        <!-- Search field with suggestions -->
+        <div class="search-field" style="flex:2;position:relative;">
+          <input type="text" id="searchQuery" placeholder="Search by title, model, brand…"
+                 autocomplete="off"
+                 oninput="fetchSuggestions()"
+                 onkeydown="handleSearchKey(event)"/>
+          <!-- Suggestions Dropdown -->
+          <div id="searchSuggestions" style="
+            display:none;
+            position:absolute;
+            top:calc(100% + 4px);
+            left:0; right:0;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:8px;
+            z-index:300;
+            overflow:hidden;
+            box-shadow:0 8px 32px rgba(0,0,0,0.6);
+          "></div>
+        </div>
+
+        <div class="search-field">
+          <select id="searchCity">
+            <option value="">All Cities</option>
+            <option>Lahore</option><option>Karachi</option><option>Islamabad</option>
+            <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option>
+            <option>Peshawar</option><option>Quetta</option><option>Sialkot</option>
+            <option>Gujranwala</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <select id="searchCategory">
+            <option value="">All Types</option>
+            <option value="car">🚗 Cars</option>
+            <option value="bike">🏍️ Bikes</option>
+            <option value="truck">🚛 Trucks</option>
+          </select>
+        </div>
+        <button class="btn-search" onclick="doSearch()">Search →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add these JS functions to index.html's <script> block -->
+  <script>
+    // === Search suggestions for index.html ===
+    let _suggestTimer = null;
+    let _suggestIdx   = -1;
+
+    async function fetchSuggestions() {
+      const q = document.getElementById('searchQuery').value.trim();
+      const drop = document.getElementById('searchSuggestions');
+
+      clearTimeout(_suggestTimer);
+      drop.style.display = 'none';
+      drop.innerHTML = '';
+
+      if (q.length < 2) return;
+
+      _suggestTimer = setTimeout(async () => {
+        try {
+          const res  = await fetch(`${API}/vehicles/search/suggestions?q=${encodeURIComponent(q)}`);
+          const data = await res.json();
+          const items = data.suggestions || [];
+
+          if (!items.length) return;
+
+          drop.innerHTML = items.map((s, i) => `
+            <div onclick="pickSearch('${s.text.replace(/'/g,"\\'")}'); return false;"
+                 onmouseenter="_suggestIdx=${i};highlightSuggest()"
+                 style="
+                   display:flex;align-items:center;gap:0.75rem;
+                   padding:0.65rem 1rem;cursor:pointer;font-size:0.85rem;
+                   transition:background 0.15s;color:var(--text);
+                 "
+                 onmouseover="this.style.background='var(--accent-dim)'"
+                 onmouseout="this.style.background=''">
+              <span style="color:var(--muted);">${s.type === 'city' ? '📍' : '🚗'}</span>
+              ${s.text}
+              <span style="margin-left:auto;font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">${s.type}</span>
+            </div>
+          `).join('');
+
+          drop.style.display = 'block';
+          _suggestIdx = -1;
+        } catch { /* silent */ }
+      }, 250);
+    }
+
+    function pickSearch(text) {
+      document.getElementById('searchQuery').value = text;
+      document.getElementById('searchSuggestions').style.display = 'none';
+      doSearch();
+    }
+
+    function handleSearchKey(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('searchSuggestions').style.display = 'none';
+        doSearch();
+      } else if (e.key === 'Escape') {
+        document.getElementById('searchSuggestions').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-field')) {
+        const drop = document.getElementById('searchSuggestions');
+        if (drop) drop.style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- CATEGORIES -->
+  <section class="categories-section">
+    <div class="section-header">
+      <h2 class="section-title">Browse by <span>Category</span></h2>
+    </div>
+    <div class="categories-grid">
+      <a href="vehicles.html?category=car" class="category-card">
+        <div class="cat-icon">🚗</div>
+        <div class="cat-info">
+          <div class="cat-name">Cars</div>
+          <div class="cat-count" id="carCount">Loading…</div>
+        </div>
+      </a>
+      <a href="vehicles.html?category=bike" class="category-card">
+        <div class="cat-icon">🏍️</div>
+        <div class="cat-info">
+          <div class="cat-name">Bikes</div>
+          <div class="cat-count" id="bikeCount">Loading…</div>
+        </div>
+      </a>
+      <a href="vehicles.html?category=truck" class="category-card">
+        <div class="cat-icon">🚛</div>
+        <div class="cat-info">
+          <div class="cat-name">Trucks</div>
+          <div class="cat-count" id="truckCount">Loading…</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- LATEST VEHICLES -->
+  <section class="vehicles-section">
+    <div class="section-header">
+      <h2 class="section-title">Latest <span>Listings</span></h2>
+      <a href="vehicles.html" class="section-link">View All →</a>
+    </div>
+    <div class="vehicles-grid" id="vehiclesGrid">
+      <!-- Skeleton placeholders -->
+      ${[...Array(6)].map(() => `
+        <div class="vehicle-card" style="pointer-events:none">
+          <div class="card-img-placeholder skeleton" style="height:180px; border-radius:0;"></div>
+          <div class="card-body">
+            <div class="skeleton" style="height:10px;width:60px;margin-bottom:10px;"></div>
+            <div class="skeleton" style="height:16px;width:90%;margin-bottom:6px;"></div>
+            <div class="skeleton" style="height:13px;width:60%;margin-bottom:16px;"></div>
+            <div class="skeleton" style="height:1px;width:100%;margin-bottom:12px;"></div>
+            <div style="display:flex;justify-content:space-between">
+              <div class="skeleton" style="height:20px;width:80px;"></div>
+              <div class="skeleton" style="height:34px;width:34px;border-radius:6px;"></div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Four<span>Wheels</span></div>
+    <div class="footer-copy">© 2025 FourWheels — Pakistan's Vehicle Marketplace</div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+
+    // ===== AUTH STATE =====
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem('fw_user') || 'null'); } catch { return null; }
+    }
+
+    function getToken() { return localStorage.getItem('fw_token'); }
+
+    function setupNav() {
+  const user        = getUser();
+  const navActions  = document.getElementById('navActions');
+  const navDashLink = document.getElementById('navDashLink');
+  const heroRegisterBtn = document.getElementById('heroRegisterBtn');
+
+  if (user) {
+    navDashLink.style.display = 'block';
+
+    if (user.role === 'admin') {
+      navDashLink.href        = 'admin-dashboard.html';
+      navDashLink.textContent = 'Admin Panel';
+    } else if (user.role === 'seller') {
+      navDashLink.href        = 'seller-dashboard.html';
+      navDashLink.textContent = 'My Dashboard';
+      heroRegisterBtn.textContent = 'My Dashboard';
+      heroRegisterBtn.href        = 'seller-dashboard.html';
+    } else {
+      // Buyer
+      navDashLink.href        = 'buyer-messages.html';
+      navDashLink.textContent = 'My Messages';
+    }
+
+    navActions.innerHTML = `
+      <span style="font-size:0.82rem;color:var(--muted)">Hi, ${user.name.split(' ')[0]}</span>
+      <button class="btn-ghost" onclick="logout()">Logout</button>
+    `;
+  } else {
+    navActions.innerHTML = `
+      <a href="login.html" class="btn-ghost">Sign In</a>
+      <a href="register.html" class="btn-accent">Register</a>
+    `;
+  }
+}
+
+    function logout() {
+      localStorage.removeItem('fw_token');
+      localStorage.removeItem('fw_user');
+      window.location.reload();
+    }
+
+    // ===== TOAST =====
+    function showToast(msg, type = 'error') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ===== FORMAT PRICE =====
+    function formatPrice(p) {
+      if (p >= 10000000) return (p / 10000000).toFixed(1) + ' Cr';
+      if (p >= 100000) return (p / 100000).toFixed(1) + ' Lac';
+      return 'Rs ' + p.toLocaleString();
+    }
+
+    // ===== BUILD CARD =====
+    function buildCard(v, delay = 0) {
+      const img = v.images && v.images.length > 0
+        ? `<img src="${API.replace('/api','')}/${v.images[0]}" alt="${v.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+        : '';
+
+      const catIcon = { car: '🚗', bike: '🏍️', truck: '🚛' }[v.category] || '🚗';
+
+      return `
+        <a href="vehicle-detail.html?id=${v._id}" class="vehicle-card" style="animation-delay:${delay}ms">
+          <div class="card-img-placeholder">
+            ${img}
+            <span style="position:relative;z-index:1;${img ? 'display:none' : ''}">${catIcon}</span>
+            <span class="card-badge">${v.category.toUpperCase()}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-category">${v.category}</div>
+            <div class="card-title">${v.title}</div>
+            <div class="card-meta">
+              <span>📍 ${v.city || 'N/A'}</span>
+              <span>👁 ${v.views || 0} views</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price">
+                ${formatPrice(v.price)}
+                <small>Asking Price</small>
+              </div>
+              <div class="card-view-btn">→</div>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    // ===== LOAD VEHICLES =====
+    async function loadVehicles() {
+      try {
+        const res = await fetch(`${API}/vehicles?limit=6&status=approved`);
+        const data = await res.json();
+        const grid = document.getElementById('vehiclesGrid');
+
+        if (!res.ok) throw new Error(data.message);
+
+        const vehicles = data.vehicles || [];
+
+        if (vehicles.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🚗</div>
+              <div class="empty-title">No Vehicles Yet</div>
+              <div class="empty-desc">Be the first to list a vehicle!</div>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = vehicles.map((v, i) => buildCard(v, i * 80)).join('');
+
+        // Update stats
+        document.getElementById('statListings').textContent =
+          data.pagination?.total ? data.pagination.total + '+' : '5K+';
+
+      } catch (err) {
+        document.getElementById('vehiclesGrid').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Could Not Load</div>
+            <div class="empty-desc">Make sure the backend server is running.</div>
+          </div>
+        `;
+        showToast('Cannot connect to server', 'error');
+      }
+    }
+
+    // ===== LOAD CATEGORY COUNTS =====
+    async function loadCategoryCounts() {
+      const cats = ['car', 'bike', 'truck'];
+      const ids  = ['carCount', 'bikeCount', 'truckCount'];
+
+      for (let i = 0; i < cats.length; i++) {
+        try {
+          const res = await fetch(`${API}/vehicles?status=approved&category=${cats[i]}&limit=1`);
+          const data = await res.json();
+          if (res.ok) {
+            const count = data.pagination?.total || 0;
+            document.getElementById(ids[i]).textContent =
+              count === 0 ? 'No listings yet' : count + ' listings available';
+          }
+        } catch {
+          document.getElementById(ids[i]).textContent = '—';
+        }
+      }
+    }
+
+    // ===== SEARCH =====
+    function doSearch() {
+      const q    = document.getElementById('searchQuery').value.trim();
+      const city = document.getElementById('searchCity').value;
+      const cat  = document.getElementById('searchCategory').value;
+
+      const params = new URLSearchParams();
+      if (q)    params.set('search', q);
+      if (city) params.set('city', city);
+      if (cat)  params.set('category', cat);
+
+      window.location.href = `vehicles.html?${params.toString()}`;
+    }
+
+    // Enter key on search
+    document.getElementById('searchQuery').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    // ===== MOBILE MENU =====
+    function toggleMobileMenu() {
+      // Simple scroll to search section
+      document.getElementById('searchSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ===== INIT =====
+    setupNav();
+    loadVehicles();
+    loadCategoryCounts();
+  </script>
+</body>
+</html>

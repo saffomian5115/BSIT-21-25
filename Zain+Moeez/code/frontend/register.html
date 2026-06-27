@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FourWheels — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --card: #18181c;
+      --border: #2a2a30;
+      --accent: #e8390e;
+      --accent-glow: rgba(232,57,14,0.25);
+      --text: #f0f0f0;
+      --muted: #6b6b75;
+      --input-bg: #0f0f12;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      overflow-x: hidden;
+    }
+
+    /* Left Panel */
+    .panel-left {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 60%, rgba(232,57,14,0.18) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, var(--border) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, var(--border) 40px);
+      opacity: 0.6;
+    }
+
+    .brand-block {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .brand-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      color: var(--text);
+      text-shadow: 0 0 60px var(--accent-glow);
+    }
+
+    .brand-logo span {
+      color: var(--accent);
+    }
+
+    .brand-tagline {
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
+
+    .decor-line {
+      width: 60px;
+      height: 3px;
+      background: var(--accent);
+      margin: 1.5rem auto;
+      border-radius: 2px;
+      box-shadow: 0 0 16px var(--accent);
+    }
+
+    .panel-left .features {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+      text-align: left;
+      max-width: 280px;
+      margin-inline: auto;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .feature-item .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* Right Panel */
+    .panel-right {
+      width: 480px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2.5rem;
+      background: var(--card);
+      border-left: 1px solid var(--border);
+      animation: slideIn 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-wrapper { width: 100%; }
+
+    .form-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-subtitle {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .form-subtitle a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .form-subtitle a:hover { text-decoration: underline; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .field {
+      margin-bottom: 1.1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+      font-weight: 500;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b75' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field input::placeholder { color: var(--muted); }
+
+    .field input.error,
+    .field select.error {
+      border-color: #e83e3e;
+    }
+
+    .err-msg {
+      font-size: 0.75rem;
+      color: #e83e3e;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .role-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .role-btn {
+      flex: 1;
+      padding: 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .role-btn:hover { border-color: var(--accent); color: var(--text); }
+    .role-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover {
+      background: #c72e08;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .btn-submit:active { transform: scale(0.98); }
+
+    .btn-submit .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: all 0.3s;
+      max-width: 320px;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left-color: #22c55e; }
+    .toast.error   { border-left-color: #e83e3e; }
+
+    @media (max-width: 820px) {
+      .panel-left { display: none; }
+      .panel-right { width: 100%; border-left: none; }
+    }
+
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr; }
+      .panel-right { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left Branding Panel -->
+  <div class="panel-left">
+    <div class="brand-block">
+      <div class="brand-logo">Four<span>Wheels</span></div>
+      <div class="brand-tagline">Pakistan's Vehicle Marketplace</div>
+      <div class="decor-line"></div>
+      <div class="features">
+        <div class="feature-item"><span class="dot"></span> Verified Sellers Across Pakistan</div>
+        <div class="feature-item"><span class="dot"></span> Cars, Bikes & Trucks Listed Daily</div>
+        <div class="feature-item"><span class="dot"></span> 3D Vehicle Preview Technology</div>
+        <div class="feature-item"><span class="dot"></span> Secure Messaging & Inquiries</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="panel-right">
+    <div class="form-wrapper">
+      <div class="form-title">Create Account</div>
+      <p class="form-subtitle">Already registered? <a href="login.html">Sign in here</a></p>
+
+      <form id="registerForm" novalidate>
+
+        <!-- Role Selection -->
+        <div class="field">
+          <label>I am a</label>
+          <div class="role-group">
+            <button type="button" class="role-btn active" data-role="buyer">🧑 Buyer</button>
+            <button type="button" class="role-btn" data-role="seller">🚗 Seller</button>
+          </div>
+          <input type="hidden" id="role" value="buyer"/>
+        </div>
+
+        <!-- Name + Email -->
+        <div class="form-row">
+          <div class="field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Ali Khan" autocomplete="name"/>
+            <div class="err-msg" id="nameErr">Name is required</div>
+          </div>
+          <div class="field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="ali@email.com" autocomplete="email"/>
+            <div class="err-msg" id="emailErr">Enter a valid email</div>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Min. 6 characters" autocomplete="new-password"/>
+          <div class="err-msg" id="passwordErr">Password must be at least 6 characters</div>
+        </div>
+
+        <!-- City + Phone -->
+        <div class="form-row">
+          <div class="field">
+            <label for="city">City</label>
+            <select id="city">
+              <option value="">Select City</option>
+              <option>Lahore</option>
+              <option>Karachi</option>
+              <option>Islamabad</option>
+              <option>Rawalpindi</option>
+              <option>Faisalabad</option>
+              <option>Multan</option>
+              <option>Peshawar</option>
+              <option>Quetta</option>
+              <option>Sialkot</option>
+              <option>Gujranwala</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="03xx-xxxxxxx" autocomplete="tel"/>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span id="btnText">Register Now</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+
+    // Role toggle
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('role').value = btn.dataset.role;
+      });
+    });
+
+    // Toast helper
+    function showToast(msg, type = 'error') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // Validation
+    function validate() {
+      let valid = true;
+
+      const fields = [
+        { id: 'name',     errId: 'nameErr',     check: v => v.trim().length > 0 },
+        { id: 'email',    errId: 'emailErr',    check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+        { id: 'password', errId: 'passwordErr', check: v => v.length >= 6 },
+      ];
+
+      fields.forEach(({ id, errId, check }) => {
+        const input = document.getElementById(id);
+        const err   = document.getElementById(errId);
+        const ok    = check(input.value);
+        input.classList.toggle('error', !ok);
+        err.style.display = ok ? 'none' : 'block';
+        if (!ok) valid = false;
+      });
+
+      return valid;
+    }
+
+    // Submit
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const btn     = document.getElementById('submitBtn');
+      const txt     = document.getElementById('btnText');
+      const spinner = document.getElementById('spinner');
+
+      btn.disabled = true;
+      txt.style.display = 'none';
+      spinner.style.display = 'block';
+
+      const payload = {
+        name:     document.getElementById('name').value.trim(),
+        email:    document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        role:     document.getElementById('role').value,
+        city:     document.getElementById('city').value,
+        phone:    document.getElementById('phone').value.trim(),
+      };
+
+      try {
+        const res  = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('fw_token', data.token);
+          localStorage.setItem('fw_user',  JSON.stringify(data.user));
+          showToast('Registration successful! Redirecting…', 'success');
+          setTimeout(() => {
+            window.location.href = data.user.role === 'seller'
+              ? 'seller-dashboard.html'
+              : 'index.html';
+          }, 1400);
+        } else {
+          showToast(data.message || 'Registration failed', 'error');
+          btn.disabled = false;
+          txt.style.display = 'block';
+          spinner.style.display = 'none';
+        }
+      } catch (err) {
+        showToast('Cannot connect to server', 'error');
+        btn.disabled = false;
+        txt.style.display = 'block';
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

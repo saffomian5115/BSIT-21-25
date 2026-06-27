@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cast Vote — E-Voting System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg        : #f8f7f4;
+      --surface   : #ffffff;
+      --surface2  : #f5f3ef;
+      --surface3  : #ece9e3;
+      --border    : #e2ddd6;
+      --navy      : #1a2744;
+      --navy-mid  : #2c3e6b;
+      --accent    : #2563eb;
+      --accent-dim: rgba(37,99,235,.1);
+      --green     : #16a34a;
+      --green-dim : rgba(22,163,74,.1);
+      --red       : #dc2626;
+      --red-dim   : rgba(220,38,38,.1);
+      --amber     : #d97706;
+      --amber-dim : rgba(217,119,6,.1);
+      --text      : #1c1c28;
+      --text-2    : #4a4a5a;
+      --muted     : #8a8a9a;
+      --ink       : #0f0f1a;
+      --font-body : 'DM Sans', system-ui, sans-serif;
+      --font-head : 'Fraunces', Georgia, serif;
+      --shadow-sm : 0 1px 3px rgba(0,0,0,.06);
+      --shadow-md : 0 4px 16px rgba(0,0,0,.08);
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; font-size: 15px; }
+
+    /* ── Navbar ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+    .nav-logo { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; color: var(--navy); text-decoration: none; }
+    .nav-logo em { font-style: italic; color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .voter-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--navy); color: #fff; font-size: .875rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      overflow: hidden;
+    }
+    .voter-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .voter-name { font-size: .875rem; font-weight: 600; color: var(--navy); }
+    .nav-links-secondary { display: flex; gap: .15rem; align-items: center; }
+    .nav-links-secondary a { color: var(--text-2); text-decoration: none; font-size: .875rem; font-weight: 500; padding: .4rem .75rem; border-radius: 6px; transition: background .15s, color .15s; }
+    .nav-links-secondary a:hover { background: var(--surface2); color: var(--ink); }
+    .btn-logout { font-size: .8125rem; font-weight: 500; color: var(--text-2); background: none; border: 1px solid var(--border); border-radius: 6px; padding: .35rem .75rem; cursor: pointer; font-family: var(--font-body); transition: color .2s, border-color .2s; }
+    .btn-logout:hover { color: var(--red); border-color: rgba(220,38,38,.4); }
+
+    /* ── Main ── */
+    main { flex: 1; padding: 2.5rem 1.5rem; max-width: 1140px; margin: 0 auto; width: 100%; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin    { to{transform:rotate(360deg)} }
+    @keyframes scaleIn { from{transform:scale(.92);opacity:0} to{transform:scale(1);opacity:1} }
+    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+
+    /* ── Schedule banner ── */
+    #schedule-banner {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .8rem 1.1rem; border-radius: 8px; font-size: .875rem;
+      margin-bottom: 2rem; border: 1px solid var(--border); background: var(--surface);
+      animation: fadeUp .35s ease both;
+    }
+    #schedule-banner.active  { border-color: rgba(22,163,74,.3);  background: var(--green-dim); }
+    #schedule-banner.inactive{ border-color: rgba(217,119,6,.3);  background: var(--amber-dim); }
+    #schedule-banner.ended   { border-color: rgba(220,38,38,.3);  background: var(--red-dim); }
+    .banner-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--amber); }
+    .banner-dot.green { background: var(--green); animation: pulse 2s infinite; }
+    .banner-dot.red   { background: var(--red); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 1.75rem; animation: fadeUp .4s ease both; }
+    .page-title { font-family: var(--font-head); font-size: 1.6rem; font-weight: 700; color: var(--ink); letter-spacing: -.02em; }
+    .page-sub { font-size: .9375rem; color: var(--text-2); margin-top: .25rem; }
+
+    /* ── Layout ── */
+    .vote-layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; align-items: start; }
+    @media(max-width:800px) { .vote-layout { grid-template-columns: 1fr; } }
+
+    /* ── Candidate grid ── */
+    .candidates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+
+    .candidate-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+      padding: 1.5rem; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s;
+      position: relative; animation: fadeUp .4s ease both;
+    }
+    .candidate-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(37,99,235,.12); transform: translateY(-2px); }
+    .candidate-card.selected { border-color: var(--navy); box-shadow: 0 4px 20px rgba(26,39,68,.18); }
+
+    .card-check {
+      position: absolute; top: 1rem; right: 1rem;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; transition: all .2s;
+    }
+    .candidate-card.selected .card-check { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .card-check::after { content: "✓"; opacity: 0; color: #fff; transition: opacity .2s; }
+    .candidate-card.selected .card-check::after { opacity: 1; }
+
+    .card-symbol { font-size: 2.25rem; display: block; margin-bottom: .75rem; }
+    .card-name  { font-family: var(--font-head); font-size: .9375rem; font-weight: 600; color: var(--ink); margin-bottom: .25rem; }
+    .card-party { font-size: .8125rem; color: var(--text-2); margin-bottom: .6rem; }
+    .card-id    { font-size: .7rem; color: var(--muted); font-family: monospace; }
+
+    .no-candidates { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--muted); font-size: .9rem; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+
+    /* ── Sidebar ── */
+    .vote-sidebar { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 80px; }
+
+    .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; box-shadow: var(--shadow-sm); }
+    .sidebar-title { font-family: var(--font-head); font-size: .875rem; font-weight: 600; color: var(--ink); margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--border); }
+
+    /* Selected preview */
+    #selected-preview { min-height: 80px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: .4rem; }
+    #selected-preview.empty { justify-content: center; color: var(--muted); font-size: .875rem; }
+    #preview-symbol { font-size: 2rem; }
+    #preview-name   { font-family: var(--font-head); font-size: .875rem; font-weight: 600; color: var(--ink); }
+    #preview-party  { font-size: .8rem; color: var(--text-2); }
+
+    /* Location */
+    .location-row { display: flex; align-items: center; gap: .5rem; font-size: .8125rem; color: var(--text-2); margin-bottom: .75rem; }
+    .btn-location {
+      width: 100%; padding: .5rem; border-radius: 6px; font-size: .8125rem; font-weight: 600;
+      border: 1px solid var(--border); background: var(--surface2); color: var(--text-2);
+      cursor: pointer; font-family: var(--font-body); transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: .4rem;
+    }
+    .btn-location:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-location.captured { color: var(--green); border-color: rgba(22,163,74,.3); background: var(--green-dim); }
+
+    /* Cast button */
+    .btn-cast {
+      width: 100%; padding: .875rem; border-radius: 8px;
+      background: var(--navy); color: #fff; font-family: var(--font-body);
+      font-size: .9375rem; font-weight: 600; border: none; cursor: pointer;
+      transition: background .2s, box-shadow .2s, transform .1s;
+    }
+    .btn-cast:hover:not(:disabled) { background: var(--navy-mid); box-shadow: 0 6px 20px rgba(26,39,68,.25); transform: translateY(-1px); }
+    .btn-cast:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-cast .spinner { display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto; }
+    .btn-cast.loading .spinner  { display: inline-block; }
+    .btn-cast.loading .btn-text { display: none; }
+
+    /* Already voted */
+    #voted-panel { display: none; text-align: center; padding: 4rem 1.5rem; animation: fadeUp .5s ease both; }
+    #voted-panel .voted-icon { font-size: 4rem; margin-bottom: 1rem; }
+    #voted-panel h2 { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: var(--green); margin-bottom: .5rem; }
+    #voted-panel p { color: var(--text-2); font-size: .9375rem; margin-bottom: 1.5rem; }
+    .btn-results {
+      display: inline-block; padding: .75rem 1.75rem; border-radius: 8px;
+      background: var(--navy); color: #fff; font-family: var(--font-body);
+      font-size: .9375rem; font-weight: 600; text-decoration: none;
+      transition: background .2s, box-shadow .2s;
+    }
+    .btn-results:hover { background: var(--navy-mid); box-shadow: 0 6px 20px rgba(26,39,68,.22); }
+
+    /* Success overlay */
+    #success-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(248,247,244,.96); z-index: 999;
+      align-items: center; justify-content: center; flex-direction: column;
+      gap: 1.25rem; text-align: center; padding: 2rem;
+      backdrop-filter: blur(6px);
+    }
+    #success-overlay.show { display: flex; animation: fadeIn .4s ease; }
+    .success-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 3px solid var(--green); background: var(--green-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; animation: scaleIn .5s ease;
+    }
+    .success-title { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: var(--green); }
+    .success-msg { color: var(--text-2); font-size: .9375rem; max-width: 340px; line-height: 1.7; }
+
+    /* FP status */
+    #fp-status-badge {
+      font-size: .8rem; font-weight: 600; padding: .35rem .8rem;
+      border-radius: 20px; border: 1px solid var(--border);
+      color: var(--muted); background: var(--surface2); margin-top: .5rem; text-align: center;
+    }
+    #fp-status-badge.ready  { color: var(--green); border-color: rgba(22,163,74,.3); background: var(--green-dim); }
+    #fp-status-badge.failed { color: var(--red);   border-color: rgba(220,38,38,.3); background: var(--red-dim); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--ink); color: #fff; border-radius: 10px; padding: .8rem 1.5rem;
+      font-size: .875rem; font-weight: 500; min-width: 260px; text-align: center;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0; z-index: 1000; pointer-events: none; box-shadow: 0 8px 32px rgba(0,0,0,.15);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.ok  { background: var(--green); }
+    #toast.err { background: var(--red); }
+
+    footer { text-align: center; padding: 1.25rem; color: var(--muted); font-size: .8125rem; border-top: 1px solid var(--border); background: var(--surface); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">E<em>·</em>Vote</a>
+  <div class="nav-right">
+    <div class="voter-avatar" id="voter-avatar"></div>
+    <span class="voter-name" id="voter-greeting">Welcome...</span>
+    <div class="nav-links-secondary">
+      <a href="profile.html">My Profile</a>
+    </div>
+    <button class="btn-logout" onclick="logoutUser()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <!-- Schedule Banner -->
+  <div id="schedule-banner" class="inactive">
+    <div class="banner-dot" id="banner-dot"></div>
+    <span id="banner-text">Checking schedule...</span>
+  </div>
+
+  <!-- Already Voted -->
+  <div id="voted-panel">
+    <div class="voted-icon">✅</div>
+    <h2>You Have Already Voted!</h2>
+    <p>Your vote has been recorded successfully. Thank you for participating!</p>
+    <a href="result.html" class="btn-results">View Live Results →</a>
+  </div>
+
+  <!-- Voting UI -->
+  <div id="vote-ui" style="display:none">
+    <div class="page-header">
+      <h1 class="page-title">Cast Your Vote</h1>
+      <p class="page-sub" id="page-sub">Select a candidate and confirm with your fingerprint</p>
+    </div>
+
+    <div class="vote-layout">
+      <!-- Candidates -->
+      <div>
+        <div class="candidates-grid" id="candidates-grid">
+          <div class="no-candidates">Loading candidates...</div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="vote-sidebar">
+        <div class="sidebar-card">
+          <p class="sidebar-title">Selected Candidate</p>
+          <div id="selected-preview" class="empty"><span>No candidate selected yet</span></div>
+        </div>
+
+        <div class="sidebar-card">
+          <p class="sidebar-title">Location</p>
+          <div class="location-row"><span>📍</span><span id="location-status">Location not captured</span></div>
+          <button class="btn-location" id="btn-location" onclick="captureLocation()">📡 Allow Location Access</button>
+        </div>
+
+        <div class="sidebar-card">
+          <p class="sidebar-title">Confirm with Fingerprint</p>
+          <div id="fp-container-side"></div>
+          <div id="fp-status-badge">Not scanned</div>
+        </div>
+
+        <button class="btn-cast" id="btn-cast" onclick="castVote()" disabled>
+          <span class="btn-text">🗳️ Cast Vote</span>
+          <span class="spinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>© 2025 E-Voting System · Secure · Transparent · Digital</footer>
+<div id="toast"></div>
+
+<!-- Success Overlay -->
+<div id="success-overlay">
+  <div class="success-ring">✓</div>
+  <p class="success-title">Vote Successful!</p>
+  <p class="success-msg" id="success-msg">Your vote has been recorded.</p>
+  <a href="result.html" class="btn-results" style="margin-top:.5rem">View Results →</a>
+</div>
+
+<script src="js/fingerprint.js"></script>
+<script>
+  const API = "http://localhost:5000/api";
+  let selectedCandidateId = null;
+  let locationData        = null;
+  let fpReady             = false;
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    await checkSession();
+    FingerprintScanner.init("fp-container-side");
+
+    document.addEventListener("fp:statusChange", (e) => {
+      fpReady = e.detail.status === "verified" && !!e.detail.template;
+      const badge = document.getElementById("fp-status-badge");
+      if (fpReady) {
+        badge.textContent = "✓ Fingerprint Ready";
+        badge.className   = "ready";
+      } else if (e.detail.status === "failed") {
+        badge.textContent = "✗ Scan failed";
+        badge.className   = "failed";
+      } else {
+        badge.textContent = "Not scanned";
+        badge.className   = "";
+      }
+      updateCastButton();
+    });
+  });
+
+  async function checkSession() {
+    try {
+      const res  = await fetch(`${API}/me`, { credentials: "include" });
+      const data = await res.json();
+
+      if (!data.logged_in) { window.location.href = "login.html"; return; }
+
+      document.getElementById("voter-greeting").textContent = data.voter.name;
+
+      // Set avatar
+      const avatar = document.getElementById("voter-avatar");
+      if (data.voter.photo) {
+        avatar.innerHTML = `<img src="${data.voter.photo}" alt="${data.voter.name}">`;
+      } else {
+        avatar.textContent = data.voter.name.charAt(0).toUpperCase();
+      }
+
+      if (data.voter.hasVoted) {
+        document.getElementById("voted-panel").style.display = "block";
+        checkSchedule(false);
+        return;
+      }
+
+      document.getElementById("vote-ui").style.display = "block";
+      await Promise.all([checkSchedule(true), loadCandidates()]);
+    } catch(e) {
+      showToast("Cannot connect to server", "err");
+      setTimeout(() => window.location.href = "login.html", 2500);
+    }
+  }
+
+  async function checkSchedule(enableVoting) {
+    try {
+      const res  = await fetch(`${API}/vote/status`, { credentials: "include" });
+      const data = await res.json();
+      const banner = document.getElementById("schedule-banner");
+      const dot    = document.getElementById("banner-dot");
+      const text   = document.getElementById("banner-text");
+
+      if (data.voting_active) {
+        banner.className = "active";
+        dot.className    = "banner-dot green";
+        const end = data.schedule ? new Date(data.schedule.end).toLocaleString() : "";
+        text.textContent = `✓ Voting is active — until ${end}`;
+      } else if (data.schedule && new Date(data.schedule.end) < new Date()) {
+        banner.className = "ended";
+        dot.className    = "banner-dot red";
+        text.textContent = "Voting has ended";
+        if (enableVoting) disableVoting(data.reason);
+      } else {
+        banner.className = "inactive";
+        dot.className    = "banner-dot";
+        text.textContent = data.reason || "Voting schedule not set";
+        if (enableVoting) disableVoting(data.reason);
+      }
+    } catch(e) { /* ignore */ }
+  }
+
+  function disableVoting(reason) {
+    document.getElementById("page-sub").textContent = reason || "Cannot vote at this time";
+    document.getElementById("btn-cast").disabled = true;
+  }
+
+  async function loadCandidates() {
+    try {
+      const res  = await fetch(`${API}/results`, { credentials: "include" });
+      const data = await res.json();
+      const grid = document.getElementById("candidates-grid");
+
+      if (!data.results || data.results.length === 0) {
+        grid.innerHTML = `<div class="no-candidates">No candidates registered yet — contact admin</div>`;
+        return;
+      }
+
+      grid.innerHTML = "";
+      data.results.forEach((c, i) => {
+        const card = document.createElement("div");
+        card.className = "candidate-card";
+        card.style.animationDelay = `${i * .07}s`;
+        card.setAttribute("data-id", c.id);
+        card.innerHTML = `
+          <div class="card-check"></div>
+          <span class="card-symbol">${getSymbolEmoji(c.symbol)}</span>
+          <p class="card-name">${c.name}</p>
+          <p class="card-party">${c.party}</p>
+          <p class="card-id">#${c.id.slice(-6).toUpperCase()}</p>
+        `;
+        card.addEventListener("click", () => selectCandidate(c.id, card, c));
+        grid.appendChild(card);
+      });
+    } catch(e) {
+      showToast("Failed to load candidates", "err");
+    }
+  }
+
+  function getSymbolEmoji(symbol) {
+    const map = { bat:"🏏",arrow:"🏹",book:"📚",lion:"🦁",tiger:"🐯",star:"⭐",flag:"🚩",torch:"🔦",key:"🗝️",scale:"⚖️",tractor:"🚜",wheel:"☸️" };
+    return map[symbol?.toLowerCase()] || "🗳️";
+  }
+
+  function selectCandidate(id, card, data) {
+    document.querySelectorAll(".candidate-card").forEach(c => c.classList.remove("selected"));
+    card.classList.add("selected");
+    selectedCandidateId = id;
+    const preview = document.getElementById("selected-preview");
+    preview.className = "";
+    preview.innerHTML = `
+      <span id="preview-symbol">${getSymbolEmoji(data.symbol)}</span>
+      <p id="preview-name">${data.name}</p>
+      <p id="preview-party">${data.party}</p>
+    `;
+    updateCastButton();
+  }
+
+  async function captureLocation() {
+    const btn = document.getElementById("btn-location");
+    btn.textContent = "⟳ Getting location...";
+    if (!navigator.geolocation) {
+      document.getElementById("location-status").textContent = "Browser not supported";
+      btn.textContent = "❌ Not supported";
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        locationData = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+        document.getElementById("location-status").textContent = `${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)}`;
+        btn.textContent = "✓ Location Captured";
+        btn.className   = "btn-location captured";
+        btn.onclick     = null;
+        updateCastButton();
+      },
+      () => {
+        document.getElementById("location-status").textContent = "Permission denied";
+        btn.textContent = "❌ Location denied";
+        locationData = null;
+      }
+    );
+  }
+
+  function updateCastButton() {
+    const btn = document.getElementById("btn-cast");
+    if (!btn) return;
+    btn.disabled = !(selectedCandidateId && fpReady);
+  }
+
+  async function castVote() {
+    if (!selectedCandidateId) { showToast("Please select a candidate", "err"); return; }
+    if (!fpReady)             { showToast("Please scan your fingerprint", "err"); return; }
+
+    const btn = document.getElementById("btn-cast");
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    try {
+      const payload = { candidate_id: selectedCandidateId, fp_template: FingerprintScanner.getTemplate() };
+      if (locationData) { payload.latitude = locationData.latitude; payload.longitude = locationData.longitude; }
+
+      const res  = await fetch(`${API}/vote`, { method: "POST", credentials: "include", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById("success-msg").textContent = data.message;
+        document.getElementById("success-overlay").classList.add("show");
+        setTimeout(() => window.location.href = "result.html", 5000);
+      } else {
+        showToast(data.error || "Vote failed", "err");
+        btn.disabled = false;
+        btn.classList.remove("loading");
+      }
+    } catch(e) {
+      showToast("Cannot connect to server", "err");
+      btn.disabled = false;
+      btn.classList.remove("loading");
+    }
+  }
+
+  async function logoutUser() {
+    await fetch(`${API}/logout`, { credentials: "include" });
+    window.location.href = "login.html";
+  }
+
+  let _tt = null;
+  function showToast(msg, type = "ok") {
+    const el = document.getElementById("toast");
+    el.textContent = msg; el.className = `show ${type}`;
+    clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove("show"), 3500);
+  }
+</script>
+</body>
+</html>

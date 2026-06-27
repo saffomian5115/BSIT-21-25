@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FourWheels — Seller Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --card: #18181c;
+      --card2: #1e1e23;
+      --border: #2a2a30;
+      --accent: #e8390e;
+      --accent-glow: rgba(232,57,14,0.22);
+      --accent-dim: rgba(232,57,14,0.1);
+      --text: #f0f0f0;
+      --muted: #6b6b75;
+      --muted2: #9898a4;
+      --input-bg: #0f0f12;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #e83e3e;
+      --sidebar-w: 240px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ========================
+       SIDEBAR
+    ======================== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-logo {
+      padding: 1.6rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo .logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .sidebar-logo .logo-text span { color: var(--accent); }
+
+    .sidebar-logo .role-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,57,14,0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1.25rem 0;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.5rem 1.5rem 0.4rem;
+      margin-top: 0.75rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1.5rem;
+      color: var(--muted2);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .nav-item .icon {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .seller-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .seller-avatar {
+      width: 36px; height: 36px;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .seller-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .seller-email {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 0.6rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted2);
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* ========================
+       MAIN CONTENT
+    ======================== */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.06em;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: #c72e08;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1rem;
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .content {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    /* ========================
+       SECTIONS (tab views)
+    ======================== */
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========================
+       STATS CARDS
+    ======================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stat-card:hover { border-color: rgba(232,57,14,0.4); }
+    .stat-card:hover::before { opacity: 1; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .stat-value.accent { color: var(--accent); }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ========================
+       VEHICLE LIST TABLE
+    ======================== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.06em;
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table-search {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .table-search input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.55rem 0.9rem;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .table-search input:focus { border-color: var(--accent); }
+    .table-search input::placeholder { color: var(--muted); }
+
+    .filter-select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.55rem 0.9rem;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus { border-color: var(--accent); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--card2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 0.8rem 1.25rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(42,42,48,0.6);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: rgba(255,255,255,0.015); }
+
+    .vehicle-thumb {
+      width: 52px; height: 40px;
+      object-fit: cover;
+      border-radius: 5px;
+      background: var(--card2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .vehicle-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .vehicle-info { display: flex; align-items: center; gap: 0.9rem; }
+
+    .vehicle-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .vehicle-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge-pending  { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-approved { background: rgba(34,197,94,0.12);  color: var(--green);  border: 1px solid rgba(34,197,94,0.3); }
+    .badge-rejected { background: rgba(232,62,62,0.12);  color: var(--red);    border: 1px solid rgba(232,62,62,0.3); }
+    .badge-car      { background: rgba(59,130,246,0.12); color: #60a5fa;       border: 1px solid rgba(59,130,246,0.3); }
+    .badge-bike     { background: rgba(168,85,247,0.12); color: #c084fc;       border: 1px solid rgba(168,85,247,0.3); }
+    .badge-truck    { background: rgba(245,158,11,0.12); color: #fbbf24;       border: 1px solid rgba(245,158,11,0.3); }
+
+    .action-btns { display: flex; gap: 0.5rem; }
+
+    .btn-icon {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-icon.del:hover { border-color: var(--red); color: var(--red); }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+    }
+
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* ========================
+       ADD/EDIT VEHICLE FORM
+    ======================== */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .form-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .form-card-body { padding: 1.75rem; }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .field {
+      margin-bottom: 0;
+    }
+
+    .field + .field { margin-top: 0; }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+      font-weight: 500;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      border-radius: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.6;
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b75' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--muted); }
+
+    .field input.err,
+    .field select.err { border-color: var(--red); }
+
+    .err-msg {
+      font-size: 0.75rem;
+      color: var(--red);
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    /* Upload zones */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag { border-color: var(--accent); background: var(--accent-dim); }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
+
+    .upload-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .upload-text strong { color: var(--accent); }
+
+    .preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .preview-item {
+      position: relative;
+      width: 72px; height: 60px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .preview-remove {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 18px; height: 18px;
+      background: rgba(0,0,0,0.75);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 0.65rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-cancel {
+      padding: 0.7rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted2);
+      border-radius: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover { border-color: var(--muted2); color: var(--text); }
+
+    .btn-save {
+      padding: 0.7rem 2rem;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      border-radius: 7px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-save:hover { background: #c72e08; box-shadow: 0 0 20px var(--accent-glow); }
+    .btn-save:active { transform: scale(0.97); }
+
+    .spinner-sm {
+      display: none;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ========================
+       MESSAGES SECTION
+    ======================== */
+    .messages-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.25rem;
+      height: calc(100vh - 200px);
+    }
+
+    .msg-list-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+    }
+
+    .msg-panel-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .msg-items {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .msg-item {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(42,42,48,0.5);
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .msg-item:hover { background: rgba(255,255,255,0.025); }
+    .msg-item.active { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+
+    .msg-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted2);
+      flex-shrink: 0;
+    }
+
+    .msg-item-info { flex: 1; overflow: hidden; }
+
+    .msg-item-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .msg-item-preview {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 0.15rem;
+    }
+
+    .msg-item-time {
+      font-size: 0.68rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .unread-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .msg-view-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-view-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .msg-view-name { font-weight: 600; font-size: 0.95rem; }
+    .msg-view-sub { font-size: 0.75rem; color: var(--muted); }
+
+    .msg-chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .msg-bubble-wrap { display: flex; gap: 0.6rem; align-items: flex-end; }
+    .msg-bubble-wrap.from-me { flex-direction: row-reverse; }
+
+    .msg-bubble {
+      max-width: 70%;
+      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .msg-bubble-wrap:not(.from-me) .msg-bubble {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
+    }
+
+    .msg-bubble-wrap.from-me .msg-bubble {
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,57,14,0.25);
+      border-bottom-right-radius: 3px;
+      color: var(--text);
+    }
+
+    .msg-time { font-size: 0.65rem; color: var(--muted); white-space: nowrap; margin-bottom: 0.2rem; }
+
+    .msg-compose {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .msg-compose input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      border-radius: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .msg-compose input:focus { border-color: var(--accent); }
+    .msg-compose input::placeholder { color: var(--muted); }
+
+    .btn-send {
+      padding: 0.7rem 1.25rem;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      border-radius: 7px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-send:hover { background: #c72e08; }
+
+    /* ========================
+       TOAST
+    ======================== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      padding: 0.9rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.3s;
+      max-width: 320px;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left-color: var(--green); }
+    .toast.error   { border-left-color: var(--red); }
+
+    /* ========================
+       MODAL (Confirm Delete)
+    ======================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 380px;
+      width: 90%;
+      transform: translateY(20px);
+      transition: transform 0.25s;
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .modal-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 1.5rem; }
+
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    .btn-modal-cancel {
+      padding: 0.6rem 1.2rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted2);
+      border-radius: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-cancel:hover { border-color: var(--muted2); color: var(--text); }
+
+    .btn-modal-confirm {
+      padding: 0.6rem 1.2rem;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      border-radius: 7px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-modal-confirm:hover { background: #c53030; }
+
+    /* ========================
+       MOBILE TOPBAR TOGGLE
+    ======================== */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* ========================
+       SCROLLBAR
+    ======================== */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ========================
+       RESPONSIVE
+    ======================== */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .messages-layout { grid-template-columns: 1fr; height: auto; }
+      .msg-list-panel { max-height: 300px; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .mobile-menu-btn { display: block; }
+      .form-grid-2,
+      .form-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .content { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========================
+     SIDEBAR
+======================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Four<span>Wheels</span></div>
+    <span class="role-badge">Seller Portal</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" data-section="dashboard" href="#">
+      <span class="icon">📊</span> Dashboard
+    </a>
+
+    <div class="nav-section-label">Listings</div>
+    <a class="nav-item" data-section="my-listings" href="#">
+      <span class="icon">🚗</span> My Vehicles
+    </a>
+    <a class="nav-item" data-section="add-vehicle" href="#">
+      <span class="icon">➕</span> Add New Vehicle
+    </a>
+
+    <div class="nav-section-label">Communication</div>
+    <a class="nav-item" data-section="messages" href="#">
+      <span class="icon">💬</span> Messages
+      <span id="unreadBadge" style="margin-left:auto;background:var(--accent);color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:10px;display:none;">0</span>
+    </a>
+
+    <div class="nav-section-label">Account</div>
+    <a class="nav-item" href="index.html">
+      <span class="icon">🌐</span> View Marketplace
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="seller-info">
+      <div class="seller-avatar" id="sidebarAvatar">S</div>
+      <div>
+        <div class="seller-name" id="sidebarName">Loading…</div>
+        <div class="seller-email" id="sidebarEmail">—</div>
+      </div>
+    </div>
+    <button class="btn-logout" id="logoutBtn">Sign Out</button>
+  </div>
+</aside>
+
+<!-- ========================
+     MAIN
+======================== -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-ghost" id="refreshBtn">↺ Refresh</button>
+      <button class="btn-primary" id="topAddBtn">+ Add Vehicle</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ========================
+         SECTION: DASHBOARD
+    ======================== -->
+    <section class="section active" id="section-dashboard">
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🚗</div>
+          <div class="stat-label">Total Listings</div>
+          <div class="stat-value accent" id="statTotal">—</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Approved</div>
+          <div class="stat-value" id="statApproved">—</div>
+          <div class="stat-sub">Live on marketplace</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Pending Review</div>
+          <div class="stat-value" id="statPending">—</div>
+          <div class="stat-sub">Awaiting admin approval</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-label">Total Views</div>
+          <div class="stat-value" id="statViews">—</div>
+          <div class="stat-sub">Across all listings</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Recent Listings</div>
+        <button class="btn-ghost" id="viewAllBtn">View All →</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Views</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recentVehiclesBody">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🚗</div><p>Loading vehicles…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================
+         SECTION: MY LISTINGS
+    ======================== -->
+    <section class="section" id="section-my-listings">
+      <div class="section-header">
+        <div class="section-title">My Vehicles</div>
+        <button class="btn-primary" id="addFromListBtn">+ Add New</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-search">
+          <input type="text" id="listingSearch" placeholder="Search by title, city…"/>
+          <select class="filter-select" id="listingFilter">
+            <option value="">All Status</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Views</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allVehiclesBody">
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🚗</div><p>Loading vehicles…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================
+         SECTION: ADD / EDIT VEHICLE
+    ======================== -->
+    <section class="section" id="section-add-vehicle">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-title" id="formTitle">Add New Vehicle</div>
+          <button class="btn-ghost" id="cancelFormBtn">✕ Cancel</button>
+        </div>
+        <div class="form-card-body">
+          <form id="vehicleForm" novalidate>
+            <input type="hidden" id="editVehicleId"/>
+
+            <div class="form-grid-2" style="margin-bottom:1.25rem;">
+              <div class="field">
+                <label for="vTitle">Vehicle Title *</label>
+                <input type="text" id="vTitle" placeholder="e.g. Toyota Corolla 2021"/>
+                <div class="err-msg" id="vTitleErr">Title is required</div>
+              </div>
+              <div class="field">
+                <label for="vPrice">Price (PKR) *</label>
+                <input type="number" id="vPrice" placeholder="e.g. 3500000"/>
+                <div class="err-msg" id="vPriceErr">Price is required</div>
+              </div>
+            </div>
+
+            <div class="form-grid-3" style="margin-bottom:1.25rem;">
+              <div class="field">
+                <label for="vCategory">Category *</label>
+                <select id="vCategory">
+                  <option value="">Select Category</option>
+                  <option value="car">🚗 Car</option>
+                  <option value="bike">🏍️ Bike</option>
+                  <option value="truck">🚛 Truck</option>
+                </select>
+                <div class="err-msg" id="vCategoryErr">Category is required</div>
+              </div>
+              <div class="field">
+                <label for="vCity">City *</label>
+                <select id="vCity">
+                  <option value="">Select City</option>
+                  <option>Lahore</option>
+                  <option>Karachi</option>
+                  <option>Islamabad</option>
+                  <option>Rawalpindi</option>
+                  <option>Faisalabad</option>
+                  <option>Multan</option>
+                  <option>Peshawar</option>
+                  <option>Quetta</option>
+                  <option>Sialkot</option>
+                  <option>Gujranwala</option>
+                </select>
+                <div class="err-msg" id="vCityErr">City is required</div>
+              </div>
+              <div class="field" id="statusFieldWrap" style="display:none;">
+                <label for="vStatus">Status (Admin Only)</label>
+                <select id="vStatus">
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field field-full" style="margin-bottom:1.25rem;">
+              <label for="vDescription">Description *</label>
+              <textarea id="vDescription" placeholder="Describe the vehicle condition, features, mileage, year…"></textarea>
+              <div class="err-msg" id="vDescErr">Description is required</div>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- Image Upload -->
+            <div style="margin-bottom:1.25rem;">
+              <label style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500;display:block;margin-bottom:0.5rem;">Vehicle Images (Max 10)</label>
+              <div class="upload-zone" id="imageUploadZone">
+                <input type="file" id="imageInput" multiple accept=".jpg,.jpeg,.png,.webp"/>
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text"><strong>Click or drag</strong> images here<br>JPEG, JPG, PNG, WEBP — multiple allowed</div>
+              </div>
+              <div class="preview-grid" id="imagePreviewGrid"></div>
+            </div>
+
+            <!-- 3D Model Upload -->
+            <div style="margin-bottom:1rem;">
+              <label style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500;display:block;margin-bottom:0.5rem;">3D Model File <span style="color:var(--muted);font-size:0.7rem;text-transform:none;">(Optional — .glb or .gltf)</span></label>
+              <div class="upload-zone" id="modelUploadZone">
+                <input type="file" id="modelInput" accept=".glb,.gltf"/>
+                <div class="upload-icon">📦</div>
+                <div class="upload-text" id="modelUploadText"><strong>Click or drag</strong> 3D model here<br>.glb or .gltf format</div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cancelForm2Btn">Cancel</button>
+              <button type="submit" class="btn-save" id="saveVehicleBtn">
+                <span id="saveBtnText">Save Vehicle</span>
+                <div class="spinner-sm" id="saveSpinner"></div>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================
+         SECTION: MESSAGES
+    ======================== -->
+    <section class="section" id="section-messages">
+      <div class="section-header" style="margin-bottom:1.25rem;">
+        <div class="section-title">Buyer Messages</div>
+      </div>
+
+      <div class="messages-layout">
+        <div class="msg-list-panel">
+          <div class="msg-panel-header">
+            <div class="msg-panel-title">Conversations</div>
+          </div>
+          <div class="msg-items" id="msgList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <div class="msg-view-panel" id="msgViewPanel">
+          <div class="msg-view-header">
+            <div class="msg-avatar" id="msgViewAvatar">?</div>
+            <div>
+              <div class="msg-view-name" id="msgViewName">Select a conversation</div>
+              <div class="msg-view-sub" id="msgViewVehicle">—</div>
+            </div>
+          </div>
+          <div class="msg-chat-area" id="msgChatArea">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:0.9rem;">
+              Select a message thread to view the conversation
+            </div>
+          </div>
+          <div class="msg-compose">
+            <input type="text" id="msgReplyInput" placeholder="Type a reply…" disabled/>
+            <button class="btn-send" id="msgSendBtn" disabled>Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Delete Vehicle?</div>
+    <div class="modal-desc" id="deleteModalDesc">This will permanently remove the vehicle listing. This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="deleteCancelBtn">Cancel</button>
+      <button class="btn-modal-confirm" id="deleteConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let allVehicles = [];
+let selectedImageFiles = [];
+let selectedModelFile = null;
+let deleteTargetId = null;
+let currentMsgThread = null;
+
+// ========================
+// AUTH CHECK
+// ========================
+const token = localStorage.getItem('fw_token');
+const user  = JSON.parse(localStorage.getItem('fw_user') || '{}');
+
+if (!token || user.role !== 'seller') {
+  window.location.href = 'login.html';
+}
+
+// Fill sidebar
+document.getElementById('sidebarName').textContent = user.name || 'Seller';
+document.getElementById('sidebarEmail').textContent = user.email || '';
+document.getElementById('sidebarAvatar').textContent = (user.name || 'S').charAt(0).toUpperCase();
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('fw_token');
+  localStorage.removeItem('fw_user');
+  window.location.href = 'login.html';
+});
+
+// ========================
+// TOAST
+// ========================
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ========================
+// NAVIGATION
+// ========================
+const sections = ['dashboard', 'my-listings', 'add-vehicle', 'messages'];
+const sectionTitles = {
+  'dashboard': 'Dashboard',
+  'my-listings': 'My Vehicles',
+  'add-vehicle': 'Add New Vehicle',
+  'messages': 'Messages'
+};
+
+function switchSection(name) {
+  sections.forEach(s => {
+    document.getElementById(`section-${s}`)?.classList.remove('active');
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`section-${name}`)?.classList.add('active');
+  document.querySelector(`[data-section="${name}"]`)?.classList.add('active');
+  document.getElementById('topbarTitle').textContent = sectionTitles[name] || name;
+
+  if (name === 'dashboard' || name === 'my-listings') loadMyVehicles();
+  if (name === 'messages') loadMessages();
+}
+
+document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchSection(item.dataset.section);
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+document.getElementById('topAddBtn').addEventListener('click', () => { resetForm(); switchSection('add-vehicle'); });
+document.getElementById('addFromListBtn').addEventListener('click', () => { resetForm(); switchSection('add-vehicle'); });
+document.getElementById('viewAllBtn').addEventListener('click', () => switchSection('my-listings'));
+document.getElementById('cancelFormBtn').addEventListener('click', () => switchSection('my-listings'));
+document.getElementById('cancelForm2Btn').addEventListener('click', () => switchSection('my-listings'));
+document.getElementById('refreshBtn').addEventListener('click', () => loadMyVehicles());
+
+// Mobile menu
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// ========================
+// LOAD MY VEHICLES
+// ========================
+async function loadMyVehicles() {
+  try {
+    const res = await fetch(`${API}/vehicles/my/listings`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error();
+    allVehicles = await res.json();
+    renderStats();
+    renderVehiclesTable(allVehicles, 'recentVehiclesBody', 5);
+    renderVehiclesTable(allVehicles, 'allVehiclesBody', null);
+  } catch {
+    allVehicles = [];
+    renderStats();
+    const empty = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🚗</div><p>No vehicles found. Add your first listing!</p></div></td></tr>`;
+    document.getElementById('recentVehiclesBody').innerHTML = empty;
+    document.getElementById('allVehiclesBody').innerHTML = empty;
+  }
+}
+
+function renderStats() {
+  const total    = allVehicles.length;
+  const approved = allVehicles.filter(v => v.status === 'approved').length;
+  const pending  = allVehicles.filter(v => v.status === 'pending').length;
+  const views    = allVehicles.reduce((a, v) => a + (v.views || 0), 0);
+
+  document.getElementById('statTotal').textContent    = total;
+  document.getElementById('statApproved').textContent = approved;
+  document.getElementById('statPending').textContent  = pending;
+  document.getElementById('statViews').textContent    = views.toLocaleString();
+}
+
+function renderVehiclesTable(vehicles, tbodyId, limit) {
+  const tbody = document.getElementById(tbodyId);
+  const list  = limit ? vehicles.slice(0, limit) : vehicles;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🚗</div><p>No vehicles found.</p></div></td></tr>`;
+    return;
+  }
+
+  const hasDate = tbodyId === 'allVehiclesBody';
+
+  tbody.innerHTML = list.map(v => {
+    const imgSrc = v.images && v.images.length
+      ? `${API.replace('/api','')}/${v.images[0]}`
+      : null;
+
+    const thumbHtml = imgSrc
+      ? `<div class="vehicle-thumb"><img src="${imgSrc}" alt="" onerror="this.parentElement.textContent='🚗'"/></div>`
+      : `<div class="vehicle-thumb">🚗</div>`;
+
+    const statusBadge = `<span class="badge badge-${v.status}">${v.status}</span>`;
+    const catBadge    = `<span class="badge badge-${v.category}">${v.category}</span>`;
+    const price       = 'PKR ' + Number(v.price).toLocaleString();
+    const dateStr     = hasDate ? `<td style="font-size:0.78rem;color:var(--muted);">${new Date(v.createdAt).toLocaleDateString()}</td>` : '';
+
+    return `
+      <tr>
+        <td>
+          <div class="vehicle-info">
+            ${thumbHtml}
+            <div>
+              <div class="vehicle-name">${escHtml(v.title)}</div>
+              <div class="vehicle-meta">${v.modelFile ? '📦 3D Model' : ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>${catBadge}</td>
+        <td style="font-weight:600;">${price}</td>
+        <td style="color:var(--muted2);">${escHtml(v.city)}</td>
+        <td>${statusBadge}</td>
+        <td style="color:var(--muted2);">${v.views || 0}</td>
+        ${dateStr}
+        <td>
+          <div class="action-btns">
+            <button class="btn-icon" title="Edit" onclick="editVehicle('${v._id}')">✏️</button>
+            <button class="btn-icon del" title="Delete" onclick="confirmDelete('${v._id}', '${escHtml(v.title)}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Live search + filter
+document.getElementById('listingSearch').addEventListener('input', applyFilter);
+document.getElementById('listingFilter').addEventListener('change', applyFilter);
+
+function applyFilter() {
+  const q      = document.getElementById('listingSearch').value.toLowerCase();
+  const status = document.getElementById('listingFilter').value;
+
+  const filtered = allVehicles.filter(v => {
+    const matchQ = !q || v.title.toLowerCase().includes(q) || v.city.toLowerCase().includes(q);
+    const matchS = !status || v.status === status;
+    return matchQ && matchS;
+  });
+
+  renderVehiclesTable(filtered, 'allVehiclesBody', null);
+}
+
+// ========================
+// VEHICLE FORM
+// ========================
+function resetForm() {
+  document.getElementById('vehicleForm').reset();
+  document.getElementById('editVehicleId').value = '';
+  document.getElementById('formTitle').textContent = 'Add New Vehicle';
+  document.getElementById('saveBtnText').textContent = 'Save Vehicle';
+  selectedImageFiles = [];
+  selectedModelFile  = null;
+  document.getElementById('imagePreviewGrid').innerHTML = '';
+  document.getElementById('modelUploadText').innerHTML = '<strong>Click or drag</strong> 3D model here<br>.glb or .gltf format';
+  clearErrors();
+}
+
+function clearErrors() {
+  document.querySelectorAll('.err-msg').forEach(e => e.style.display = 'none');
+  document.querySelectorAll('.err').forEach(e => e.classList.remove('err'));
+}
+
+// Image upload
+document.getElementById('imageInput').addEventListener('change', (e) => {
+  const files = Array.from(e.target.files);
+  files.forEach(f => {
+    if (selectedImageFiles.length >= 10) return;
+    selectedImageFiles.push(f);
+    const url = URL.createObjectURL(f);
+    const idx = selectedImageFiles.length - 1;
+    const item = document.createElement('div');
+    item.className = 'preview-item';
+    item.innerHTML = `<img src="${url}"/><button class="preview-remove" data-idx="${idx}">✕</button>`;
+    document.getElementById('imagePreviewGrid').appendChild(item);
+  });
+  e.target.value = '';
+});
+
+document.getElementById('imagePreviewGrid').addEventListener('click', (e) => {
+  if (e.target.classList.contains('preview-remove')) {
+    const idx = parseInt(e.target.dataset.idx);
+    selectedImageFiles.splice(idx, 1);
+    e.target.closest('.preview-item').remove();
+    // Re-index
+    document.querySelectorAll('.preview-remove').forEach((b, i) => b.dataset.idx = i);
+  }
+});
+
+// 3D model upload
+document.getElementById('modelInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    selectedModelFile = file;
+    document.getElementById('modelUploadText').innerHTML = `<strong>📦 ${escHtml(file.name)}</strong><br><span style="color:var(--green);font-size:0.8rem;">File selected ✓</span>`;
+  }
+});
+
+// Drag & drop visual feedback
+['imageUploadZone', 'modelUploadZone'].forEach(id => {
+  const zone = document.getElementById(id);
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', () => zone.classList.remove('drag'));
+});
+
+// Form validation
+function validateVehicleForm() {
+  clearErrors();
+  let valid = true;
+
+  const checks = [
+    { id: 'vTitle',       errId: 'vTitleErr',    check: v => v.trim().length > 0 },
+    { id: 'vPrice',       errId: 'vPriceErr',    check: v => v > 0 },
+    { id: 'vCategory',    errId: 'vCategoryErr', check: v => v !== '' },
+    { id: 'vCity',        errId: 'vCityErr',     check: v => v !== '' },
+    { id: 'vDescription', errId: 'vDescErr',     check: v => v.trim().length > 0 },
+  ];
+
+  checks.forEach(({ id, errId, check }) => {
+    const el = document.getElementById(id);
+    if (!check(el.value)) {
+      el.classList.add('err');
+      document.getElementById(errId).style.display = 'block';
+      valid = false;
+    }
+  });
+
+  return valid;
+}
+
+// Submit form
+document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!validateVehicleForm()) return;
+
+  const btn     = document.getElementById('saveVehicleBtn');
+  const txt     = document.getElementById('saveBtnText');
+  const spinner = document.getElementById('saveSpinner');
+
+  btn.disabled = true;
+  txt.style.display = 'none';
+  spinner.style.display = 'block';
+
+  const editId = document.getElementById('editVehicleId').value;
+  const method = editId ? 'PUT' : 'POST';
+  const url    = editId ? `${API}/vehicles/${editId}` : `${API}/vehicles`;
+
+  const fd = new FormData();
+  fd.append('title',       document.getElementById('vTitle').value.trim());
+  fd.append('description', document.getElementById('vDescription').value.trim());
+  fd.append('price',       document.getElementById('vPrice').value);
+  fd.append('city',        document.getElementById('vCity').value);
+  fd.append('category',    document.getElementById('vCategory').value);
+
+  selectedImageFiles.forEach(f => fd.append('images', f));
+  if (selectedModelFile) fd.append('modelFile', selectedModelFile);
+
+  try {
+    const res  = await fetch(url, {
+      method,
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      showToast(editId ? 'Vehicle updated successfully!' : 'Vehicle listed successfully!', 'success');
+      resetForm();
+      setTimeout(() => switchSection('my-listings'), 800);
+    } else {
+      showToast(data.message || 'Something went wrong', 'error');
+    }
+  } catch {
+    showToast('Cannot connect to server', 'error');
+  }
+
+  btn.disabled = false;
+  txt.style.display = 'block';
+  spinner.style.display = 'none';
+});
+
+// Edit vehicle
+function editVehicle(id) {
+  const v = allVehicles.find(x => x._id === id);
+  if (!v) return;
+
+  resetForm();
+  document.getElementById('editVehicleId').value   = id;
+  document.getElementById('vTitle').value          = v.title;
+  document.getElementById('vPrice').value          = v.price;
+  document.getElementById('vCategory').value       = v.category;
+  document.getElementById('vCity').value           = v.city;
+  document.getElementById('vDescription').value    = v.description;
+  document.getElementById('formTitle').textContent = 'Edit Vehicle';
+  document.getElementById('saveBtnText').textContent = 'Update Vehicle';
+
+  if (v.modelFile) {
+    document.getElementById('modelUploadText').innerHTML = `<strong>📦 Existing model attached</strong><br><span style="color:var(--muted);font-size:0.8rem;">Upload new to replace</span>`;
+  }
+
+  switchSection('add-vehicle');
+}
+
+// ========================
+// DELETE VEHICLE
+// ========================
+function confirmDelete(id, title) {
+  deleteTargetId = id;
+  document.getElementById('deleteModalDesc').textContent = `"${title}" will be permanently removed.`;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+document.getElementById('deleteCancelBtn').addEventListener('click', () => {
+  document.getElementById('deleteModal').classList.remove('open');
+  deleteTargetId = null;
+});
+
+document.getElementById('deleteConfirmBtn').addEventListener('click', async () => {
+  if (!deleteTargetId) return;
+  const id = deleteTargetId;
+  document.getElementById('deleteModal').classList.remove('open');
+
+  try {
+    const res = await fetch(`${API}/vehicles/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+      showToast('Vehicle deleted.', 'success');
+      loadMyVehicles();
+    } else {
+      const d = await res.json();
+      showToast(d.message || 'Delete failed', 'error');
+    }
+  } catch {
+    showToast('Cannot connect to server', 'error');
+  }
+
+  deleteTargetId = null;
+});
+
+
+
+// ===== MESSAGES =====
+async function loadMessages() {
+  const list = document.getElementById('msgList');
+  list.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading…</div>`;
+
+  try {
+    const res = await fetch(`${API}/messages/conversations`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Failed to load');
+
+    const conversations = await res.json();
+
+    if (!conversations.length) {
+      list.innerHTML = `
+        <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;opacity:0.4;">💬</div>
+          <p>No messages yet.</p>
+          <p style="margin-top:0.35rem;font-size:0.78rem;">Buyers will contact you here when they inquire about your vehicles.</p>
+        </div>`;
+      document.getElementById('unreadBadge').style.display = 'none';
+      return;
+    }
+
+    // Count unread
+    let unread = 0;
+    conversations.forEach(c => { unread += c.unreadCount || 0; });
+
+    const badge = document.getElementById('unreadBadge');
+    if (unread > 0) {
+      badge.textContent = unread;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Render conversation list
+    list.innerHTML = conversations.map(c => {
+      const other = c.otherParty;
+      const initials = (other?.name || '?').charAt(0).toUpperCase();
+      const hasUnread = c.unreadCount > 0;
+      const timeStr = formatMsgTime(c.lastTime);
+
+      return `
+        <div class="msg-item" data-key="${escHtml(c.key)}"
+             onclick='openThread(${JSON.stringify(c).replace(/'/g, "&#39;")})'>
+          <div class="msg-avatar">${initials}</div>
+          <div class="msg-item-info">
+            <div class="msg-item-name">${escHtml(other?.name || 'Unknown')}</div>
+            <div class="msg-item-preview" style="color:var(--accent);font-size:0.7rem;margin-bottom:0.1rem;">
+              🚗 ${escHtml(c.vehicle?.title || 'Vehicle')}
+            </div>
+            <div class="msg-item-preview">${escHtml(c.lastMessage)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+            <div class="msg-item-time">${timeStr}</div>
+            ${hasUnread ? `<div class="unread-dot"></div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Store conversations for later use
+    window._sellerConvs = conversations;
+
+  } catch (err) {
+    list.innerHTML = `
+      <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;">
+        Could not load messages.<br>Make sure the server is running.
+      </div>`;
+  }
+}
+
+async function openThread(conv) {
+  window._activeConv = conv;
+
+  // Mark active in list
+  document.querySelectorAll('.msg-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.key === conv.key);
+  });
+
+  // Fill header
+  const other = conv.otherParty;
+  document.getElementById('msgViewAvatar').textContent = (other?.name || '?').charAt(0).toUpperCase();
+  document.getElementById('msgViewName').textContent   = other?.name || 'Unknown Buyer';
+  document.getElementById('msgViewVehicle').textContent = 're: ' + (conv.vehicle?.title || 'Vehicle');
+
+  // Load the actual thread messages
+  await loadThread(conv);
+
+  // Enable compose
+  document.getElementById('msgReplyInput').disabled = false;
+  document.getElementById('msgSendBtn').disabled     = false;
+  document.getElementById('msgReplyInput').focus();
+
+  // Refresh conversation list to clear unread dots
+  loadMessages();
+}
+
+async function loadThread(conv) {
+  const chatArea = document.getElementById('msgChatArea');
+  chatArea.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:0.85rem;">Loading messages…</div>`;
+
+  const vehId   = conv.vehicle?._id;
+  const otherId = conv.otherParty?._id;
+
+  if (!vehId || !otherId) {
+    chatArea.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--muted);">Could not load thread.</div>`;
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/messages/thread/${vehId}/${otherId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error();
+    const messages = await res.json();
+
+    if (!messages.length) {
+      chatArea.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:0.85rem;">No messages in this thread yet.</div>`;
+      return;
+    }
+
+    chatArea.innerHTML = messages.map(msg => {
+      const fromMe = msg.sender?._id === user.id || msg.sender?.id === user.id;
+      const initials = (msg.sender?.name || '?').charAt(0).toUpperCase();
+      const timeStr = formatMsgTime(msg.createdAt);
+
+      return `
+        <div class="msg-bubble-wrap ${fromMe ? 'from-me' : ''}">
+          <div class="msg-avatar" style="width:28px;height:28px;font-size:0.75rem;">${initials}</div>
+          <div>
+            <div class="msg-time" style="${fromMe ? 'text-align:right;' : ''}">${timeStr}</div>
+            <div class="msg-bubble">${escHtml(msg.message)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Scroll to bottom
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+  } catch {
+    chatArea.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--muted);">Could not load messages.</div>`;
+  }
+}
+
+document.getElementById('msgSendBtn').addEventListener('click', sendSellerReply);
+document.getElementById('msgReplyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendSellerReply();
+});
+
+async function sendSellerReply() {
+  const input = document.getElementById('msgReplyInput');
+  const text  = input.value.trim();
+  if (!text || !window._activeConv) return;
+
+  const btn = document.getElementById('msgSendBtn');
+  btn.disabled = true;
+  input.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/messages/reply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        vehicleId:  window._activeConv.vehicle?._id,
+        receiverId: window._activeConv.otherParty?._id,
+        message:    text,
+      }),
+    });
+
+    if (res.ok) {
+      input.value = '';
+      // Reload thread to show new message
+      await loadThread(window._activeConv);
+      // Refresh conversation list
+      loadMessages();
+    } else {
+      const data = await res.json();
+      showToast(data.message || 'Failed to send', 'error');
+    }
+  } catch {
+    showToast('Cannot connect to server', 'error');
+  }
+
+  btn.disabled = false;
+  input.disabled = false;
+  input.focus();
+}
+
+// ========================
+// UTILS
+// ========================
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function formatMsgTime(dateStr) {
+  if (!dateStr) return '';
+  const d   = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return d.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' });
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7)  return diff + 'd ago';
+  return d.toLocaleDateString('en-PK', { day: 'numeric', month: 'short' });
+}
+
+// ========================
+// INIT
+// ========================
+loadMyVehicles();
+</script>
+</body>
+</html>

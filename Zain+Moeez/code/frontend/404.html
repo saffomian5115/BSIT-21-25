@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FourWheels — Page Not Found</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --card: #18181c;
+      --border: #2a2a30;
+      --accent: #e8390e;
+      --accent-glow: rgba(232,57,14,0.25);
+      --accent-dim: rgba(232,57,14,0.08);
+      --text: #f0f0f0;
+      --muted: #6b6b75;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232,57,14,0.1) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(42,42,48,0.5) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(42,42,48,0.5) 60px);
+      pointer-events: none;
+    }
+
+    /* Floating car */
+    .car-wrap {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .car-emoji {
+      font-size: 6rem;
+      display: block;
+      animation: drift 4s ease-in-out infinite;
+      filter: drop-shadow(0 12px 40px rgba(232,57,14,0.4));
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translateX(0) rotate(-2deg); }
+      25% { transform: translateX(20px) rotate(1deg); }
+      75% { transform: translateX(-20px) rotate(-1deg); }
+    }
+
+    /* Skid marks */
+    .skid-marks {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 18px;
+    }
+
+    .skid {
+      width: 6px;
+      height: 30px;
+      background: linear-gradient(to bottom, transparent, var(--muted));
+      border-radius: 3px;
+      opacity: 0.4;
+      transform: skewX(-15deg);
+    }
+
+    /* Content */
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem;
+      max-width: 560px;
+    }
+
+    .err-code {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 20vw, 10rem);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .err-code .accent { color: var(--accent); text-shadow: 0 0 60px var(--accent-glow); }
+
+    .err-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .err-desc {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.85rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 0.8rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-primary:hover {
+      background: #c72e08;
+      box-shadow: 0 0 24px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      padding: 0.8rem 2rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      transform: translateY(-2px);
+    }
+
+    /* Divider */
+    .divider {
+      width: 80px;
+      height: 3px;
+      background: var(--accent);
+      margin: 1.5rem auto;
+      border-radius: 2px;
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    /* Quick links */
+    .quick-links {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .quick-link:hover { color: var(--accent); }
+    .quick-link .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    /* Logo */
+    .logo {
+      position: fixed;
+      top: 1.5rem;
+      left: 2rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+      z-index: 10;
+    }
+
+    .logo span { color: var(--accent); }
+
+    /* Odometer ticking animation */
+    .ticker {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ticker-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      min-width: 70px;
+    }
+
+    @media (max-width: 480px) {
+      .err-code { font-size: 5rem; }
+      .actions { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-ghost { width: 200px; justify-content: center; }
+      .ticker { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="logo">Four<span>Wheels</span></a>
+
+  <!-- Floating car -->
+  <div class="car-wrap">
+    <span class="car-emoji">🚗</span>
+    <div class="skid-marks">
+      <div class="skid"></div>
+      <div class="skid"></div>
+      <div class="skid"></div>
+      <div class="skid"></div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="content">
+    <div class="err-code">
+      <span>4</span>
+      <span class="accent">0</span>
+      <span>4</span>
+    </div>
+    <div class="err-title">Road Not Found</div>
+    <div class="divider"></div>
+    <p class="err-desc">
+      Looks like this route doesn't exist on our map.<br>
+      The page you're looking for has been moved, deleted, or never existed.
+    </p>
+    <div class="actions">
+      <a href="index.html" class="btn-primary">← Back to Home</a>
+      <a href="vehicles.html" class="btn-ghost">Browse Vehicles</a>
+    </div>
+  </div>
+
+  <!-- Quick links -->
+  <div class="quick-links">
+    <a href="login.html" class="quick-link"><span class="dot"></span> Login</a>
+    <a href="register.html" class="quick-link"><span class="dot"></span> Register</a>
+    <a href="vehicles.html" class="quick-link"><span class="dot"></span> All Listings</a>
+    <a href="admin-login.html" class="quick-link"><span class="dot"></span> Admin</a>
+  </div>
+
+  <!-- Odometer easter egg -->
+  <div class="ticker">
+    <span>Lost for</span>
+    <span class="ticker-val" id="tickerVal">0s</span>
+  </div>
+
+  <script>
+    let secs = 0;
+    setInterval(() => {
+      secs++;
+      const el = document.getElementById('tickerVal');
+      if (secs < 60) el.textContent = secs + 's';
+      else el.textContent = Math.floor(secs / 60) + 'm ' + (secs % 60) + 's';
+    }, 1000);
+
+    // If user came from a broken link, show that in title
+    const ref = document.referrer;
+    if (ref) {
+      document.title = 'FourWheels — 404 | Page Not Found';
+    }
+  </script>
+
+</body>
+</html>

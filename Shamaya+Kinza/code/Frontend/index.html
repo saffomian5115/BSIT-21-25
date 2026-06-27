@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Voting System — Secure Digital Elections</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg         : #f8f7f4;
+      --bg-alt     : #f0ede8;
+      --surface    : #ffffff;
+      --surface2   : #f5f3ef;
+      --border     : #e2ddd6;
+      --navy       : #1a2744;
+      --navy-mid   : #2c3e6b;
+      --accent     : #2563eb;
+      --accent-dim : rgba(37,99,235,.1);
+      --green      : #16a34a;
+      --amber      : #d97706;
+      --red        : #dc2626;
+      --text       : #1c1c28;
+      --text-2     : #4a4a5a;
+      --muted      : #8a8a9a;
+      --ink        : #0f0f1a;
+      --font-body  : 'DM Sans', system-ui, sans-serif;
+      --font-head  : 'Fraunces', Georgia, serif;
+      --shadow-sm  : 0 1px 3px rgba(0,0,0,.06);
+      --shadow-md  : 0 4px 16px rgba(0,0,0,.08);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; font-size: 15px; }
+
+    /* ── Navbar ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm);
+    }
+    .nav-logo { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; color: var(--navy); text-decoration: none; letter-spacing: -.01em; }
+    .nav-logo em { font-style: italic; color: var(--accent); }
+    .nav-links { display: flex; gap: .15rem; align-items: center; }
+    .nav-links a { color: var(--text-2); text-decoration: none; font-size: .875rem; font-weight: 500; padding: .4rem .75rem; border-radius: 6px; transition: background .15s, color .15s; }
+    .nav-links a:hover { background: var(--surface2); color: var(--ink); }
+    .nav-links a.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+    .nav-links a.nav-cta { background: var(--navy); color: #fff; margin-left: .5rem; }
+    .nav-links a.nav-cta:hover { background: var(--navy-mid); }
+    .nav-links a.nav-admin { color: var(--muted); font-size: .8125rem; border: 1px solid var(--border); }
+    .nav-links a.nav-admin:hover { color: var(--text); border-color: var(--text-2); background: var(--surface2); }
+
+    /* ── Hero ── */
+    .hero {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 5rem 1.5rem 4rem;
+      background: linear-gradient(160deg, #fff 0%, var(--bg) 50%, var(--bg-alt) 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(37,99,235,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -40px; left: -40px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,39,68,.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 700px; text-align: center; position: relative; z-index: 1; animation: fadeUp .6s ease both; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid rgba(37,99,235,.2); border-radius: 20px;
+      font-size: .8125rem; font-weight: 600; padding: .3rem .9rem;
+      letter-spacing: .03em; margin-bottom: 1.5rem;
+    }
+    .hero-tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    h1 {
+      font-family: var(--font-head); font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 700; line-height: 1.15; letter-spacing: -.03em;
+      color: var(--ink); margin-bottom: 1.25rem;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+    h1 .dim { color: var(--muted); font-weight: 300; }
+
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-2); line-height: 1.75;
+      max-width: 520px; margin: 0 auto 2.5rem;
+    }
+    .hero-btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: .75rem 1.75rem; border-radius: 8px; background: var(--navy);
+      color: #fff; font-family: var(--font-body); font-size: .9375rem; font-weight: 600;
+      text-decoration: none; border: none; cursor: pointer; transition: background .2s, box-shadow .2s, transform .1s;
+    }
+    .btn-primary:hover { background: var(--navy-mid); box-shadow: 0 6px 20px rgba(26,39,68,.25); transform: translateY(-1px); }
+    .btn-secondary {
+      padding: .75rem 1.75rem; border-radius: 8px; background: transparent;
+      color: var(--text-2); font-family: var(--font-body); font-size: .9375rem; font-weight: 500;
+      text-decoration: none; border: 1.5px solid var(--border); cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--navy); color: var(--navy); background: var(--surface); }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      background: var(--navy); color: #fff;
+      display: flex; justify-content: center;
+    }
+    .stat-item { flex: 1; max-width: 220px; padding: 1.75rem 1rem; text-align: center; border-right: 1px solid rgba(255,255,255,.1); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: var(--font-head); font-size: 2rem; font-weight: 700; display: block; margin-bottom: .3rem; letter-spacing: -.02em; }
+    .stat-label { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; opacity: .6; }
+
+    /* ── How it works section ── */
+    section { padding: 5rem 1.5rem; }
+    .section-inner { max-width: 1060px; margin: 0 auto; }
+    .section-label { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .5rem; }
+    .section-title { font-family: var(--font-head); font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; margin-bottom: .6rem; }
+    .section-sub { color: var(--text-2); font-size: .9375rem; line-height: 1.75; margin-bottom: 3rem; max-width: 500px; }
+
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+    .step-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 1.75rem 1.5rem; position: relative; transition: box-shadow .25s, transform .25s;
+    }
+    .step-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .step-num {
+      font-family: var(--font-head); font-size: 2.5rem; font-weight: 700;
+      color: var(--bg-alt); letter-spacing: -.04em; line-height: 1; margin-bottom: .75rem;
+    }
+    .step-icon { font-size: 1.75rem; display: block; margin-bottom: .75rem; }
+    .step-title { font-family: var(--font-head); font-size: .95rem; font-weight: 600; color: var(--ink); margin-bottom: .5rem; }
+    .step-desc { font-size: .875rem; color: var(--text-2); line-height: 1.7; }
+
+    /* ── Security features ── */
+    .features-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:600px) { .features-grid { grid-template-columns: 1fr; } }
+    .feature-item {
+      display: flex; gap: 1rem; padding: 1.25rem;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .feature-item:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(37,99,235,.08); }
+    .feature-icon {
+      font-size: 1.4rem; flex-shrink: 0; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    }
+    .feature-body h4 { font-size: .875rem; font-weight: 600; color: var(--ink); margin-bottom: .3rem; font-family: var(--font-body); }
+    .feature-body p  { font-size: .8125rem; color: var(--text-2); line-height: 1.65; }
+
+    /* ── CTA ── */
+    .cta-section { text-align: center; background: var(--bg-alt); }
+    .cta-box {
+      background: var(--navy); border-radius: 20px; padding: 4rem 2rem;
+      max-width: 620px; margin: 0 auto; position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #60a5fa, var(--accent));
+    }
+    .cta-box h2 { font-family: var(--font-head); font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 700; color: #fff; margin-bottom: .75rem; letter-spacing: -.02em; }
+    .cta-box p  { color: rgba(255,255,255,.65); font-size: .9375rem; line-height: 1.7; margin-bottom: 2rem; }
+    .cta-btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-primary { padding: .8rem 2rem; border-radius: 8px; background: #fff; color: var(--navy); font-weight: 600; font-size: .9375rem; text-decoration: none; font-family: var(--font-body); transition: box-shadow .2s; }
+    .btn-cta-primary:hover { box-shadow: 0 6px 20px rgba(255,255,255,.2); }
+    .btn-cta-secondary { padding: .8rem 2rem; border-radius: 8px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); font-size: .9375rem; text-decoration: none; font-family: var(--font-body); border: 1px solid rgba(255,255,255,.2); transition: background .2s; }
+    .btn-cta-secondary:hover { background: rgba(255,255,255,.18); }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--navy); color: rgba(255,255,255,.6);
+      padding: 1.75rem 2.5rem; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-family: var(--font-head); font-size: .95rem; font-weight: 700; color: #fff; }
+    .footer-logo em { font-style: italic; color: rgba(255,255,255,.6); }
+    footer p { font-size: .8125rem; text-align: center; }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .footer-links a { color: rgba(255,255,255,.5); text-decoration: none; font-size: .8125rem; font-weight: 500; transition: color .2s; }
+    .footer-links a:hover { color: #fff; }
+    @media(max-width:600px) { footer { flex-direction: column; text-align: center; } .footer-links { justify-content: center; } .stat-item { flex: 1 1 45%; border-right: none; border-bottom: 1px solid rgba(255,255,255,.1); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">E<em>·</em>Vote</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="result.html">Results</a>
+    <a href="admin/index.html" class="nav-admin">Admin ↗</a>
+    <a href="login.html" class="nav-cta">Cast Vote</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Secure Digital Election System</div>
+    <h1>Pakistan's<br><em>Digital Vote</em><br><span class="dim">Secure · Transparent · Fast</span></h1>
+    <p class="hero-sub">With fingerprint biometrics and advanced encryption — cast your vote safely from home. No fraud, no double voting.</p>
+    <div class="hero-btns">
+      <a href="register.html" class="btn-primary">Register Now</a>
+      <a href="login.html" class="btn-secondary">Login & Vote →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-num" id="stat-voters">--</span><span class="stat-label">Registered Voters</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-voted">--</span><span class="stat-label">Votes Cast</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-turnout">--%</span><span class="stat-label">Voter Turnout</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-candidates">--</span><span class="stat-label">Candidates</span></div>
+</div>
+
+<!-- How it works -->
+<section>
+  <div class="section-inner">
+    <p class="section-label">Process</p>
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Cast your vote in 4 simple steps — with end-to-end security</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <span class="step-icon">📋</span>
+        <h3 class="step-title">Register</h3>
+        <p class="step-desc">Create your account using name, CNIC, email, and fingerprint scan. One-time process.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <span class="step-icon">🔐</span>
+        <h3 class="step-title">Login</h3>
+        <p class="step-desc">Verify identity using email + password + fingerprint. No impersonation possible.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <span class="step-icon">🗳️</span>
+        <h3 class="step-title">Cast Vote</h3>
+        <p class="step-desc">Choose your candidate. Location is automatically captured. Voting only possible during schedule.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <span class="step-icon">📊</span>
+        <h3 class="step-title">View Results</h3>
+        <p class="step-desc">See real-time results on live charts. Winner highlight and turnout percentage clearly visible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Security features -->
+<section class="features-section">
+  <div class="section-inner">
+    <p class="section-label">Security</p>
+    <h2 class="section-title">Multi-Layer Protection</h2>
+    <p class="section-sub">Security at every step — only real voters' votes are counted</p>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">🖐</div>
+        <div class="feature-body"><h4>Fingerprint Biometrics</h4><p>ISO-format template stored via SecuGen HU20 scanner. Fingerprint match required for both login and vote.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-body"><h4>Bcrypt Password Hashing</h4><p>Passwords are never stored in plain text — hashed with bcrypt salt rounds before entering database.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⏰</div>
+        <div class="feature-body"><h4>Voting Schedule Lock</h4><p>Voting only possible within the time window set by admin. Early or late votes are blocked server-side.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🚫</div>
+        <div class="feature-body"><h4>Double Vote Prevention</h4><p>Each voter can vote only once. Server-side verification ensures no client-side tampering.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📍</div>
+        <div class="feature-body"><h4>Location Tracking</h4><p>GPS coordinates captured at time of vote. City/area name retrieved via OpenStreetMap Nominatim.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-body"><h4>Session Management</h4><p>Separate admin and voter sessions. Every protected route verifies session — unauthorized access blocked.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <div class="cta-box">
+      <h2>Ready? Time to Vote</h2>
+      <p>Register now or login to cast your vote. Your voice, your right.</p>
+      <div class="cta-btns">
+        <a href="register.html" class="btn-cta-primary">Register Now</a>
+        <a href="login.html" class="btn-cta-secondary">Login & Vote →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">E<em>·</em>Vote</div>
+  <p>© 2025 E-Voting System · Flask · MongoDB · SecuGen HU20</p>
+  <div class="footer-links">
+    <a href="result.html">Results</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="admin/index.html">Admin</a>
+  </div>
+</footer>
+
+<script>
+  async function loadStats() {
+    try {
+      const [statsRes, candRes] = await Promise.all([
+        fetch("http://localhost:5000/api/results/stats"),
+        fetch("http://localhost:5000/api/results"),
+      ]);
+      if (statsRes.ok) {
+        const s = await statsRes.json();
+        animateNum("stat-voters",  s.total_voters);
+        animateNum("stat-voted",   s.total_voted);
+        document.getElementById("stat-turnout").textContent = s.turnout_percent + "%";
+      }
+      if (candRes.ok) {
+        const c = await candRes.json();
+        animateNum("stat-candidates", c.results ? c.results.length : 0);
+      }
+    } catch(e) { /* Backend down — placeholders remain */ }
+  }
+
+  function animateNum(id, target) {
+    const el = document.getElementById(id);
+    if (!el || !target) return;
+    let cur = 0;
+    const step = Math.ceil(target / 40);
+    const timer = setInterval(() => {
+      cur = Math.min(cur + step, target);
+      el.textContent = cur.toLocaleString();
+      if (cur >= target) clearInterval(timer);
+    }, 30);
+  }
+
+  loadStats();
+</script>
+</body>
+</html>

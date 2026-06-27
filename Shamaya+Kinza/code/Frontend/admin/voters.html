@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voters — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f8f7f4; --surface:#ffffff; --surface2:#f5f3ef; --surface3:#ece9e3;
+      --border:#e2ddd6; --navy:#1a2744; --navy-mid:#2c3e6b; --accent:#2563eb;
+      --accent-dim:rgba(37,99,235,.1); --green:#16a34a; --green-dim:rgba(22,163,74,.1);
+      --red:#dc2626; --red-dim:rgba(220,38,38,.1); --amber:#d97706; --amber-dim:rgba(217,119,6,.1);
+      --text:#1c1c28; --text-2:#4a4a5a; --muted:#8a8a9a; --ink:#0f0f1a;
+      --font-body:'DM Sans',system-ui,sans-serif; --font-head:'Fraunces',Georgia,serif;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06); --shadow-md:0 4px 16px rgba(0,0,0,.08);
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; font-size:15px; }
+
+    nav { display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:60px; background:var(--navy); position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+    .nav-left { display:flex; align-items:center; gap:1.5rem; }
+    .nav-logo { font-family:var(--font-head); font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none; }
+    .nav-logo em { font-style:italic; color:rgba(255,255,255,.55); }
+    .admin-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); background:rgba(217,119,6,.15); border:1px solid rgba(217,119,6,.3); border-radius:4px; padding:.2rem .55rem; }
+    .nav-links { display:flex; gap:.1rem; }
+    .nav-links a { color:rgba(255,255,255,.65); text-decoration:none; font-size:.875rem; font-weight:500; padding:.4rem .75rem; border-radius:6px; transition:background .15s,color .15s; }
+    .nav-links a:hover { background:rgba(255,255,255,.1); color:#fff; }
+    .nav-links a.active { background:rgba(255,255,255,.15); color:#fff; font-weight:600; }
+    .nav-right { display:flex; align-items:center; gap:.75rem; }
+    .back-link { font-size:.8125rem; font-weight:500; color:rgba(255,255,255,.55); text-decoration:none; padding:.35rem .7rem; border-radius:6px; border:1px solid rgba(255,255,255,.15); transition:background .15s,color .15s; }
+    .back-link:hover { background:rgba(255,255,255,.1); color:#fff; }
+    .admin-badge { font-size:.75rem; font-weight:600; color:rgba(255,255,255,.8); }
+    .btn-logout { font-size:.8125rem; color:rgba(255,255,255,.65); background:none; border:1px solid rgba(255,255,255,.2); border-radius:6px; padding:.35rem .8rem; cursor:pointer; font-family:var(--font-body); transition:color .2s,background .2s; }
+    .btn-logout:hover { color:#fca5a5; background:rgba(220,38,38,.1); }
+
+    #login-overlay { position:fixed; inset:0; background:rgba(248,247,244,.97); z-index:999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .login-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2.5rem; width:100%; max-width:380px; box-shadow:var(--shadow-md); animation:fadeUp .4s ease; }
+    .login-title { font-family:var(--font-head); font-size:1.4rem; font-weight:700; color:var(--ink); margin-bottom:.25rem; }
+    .login-sub { font-size:.875rem; color:var(--text-2); margin-bottom:2rem; }
+    .lg-field { margin-bottom:1rem; }
+    .lg-field label { display:block; font-size:.8125rem; font-weight:600; color:var(--text); margin-bottom:.4rem; }
+    .lg-field input { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:7px; color:var(--text); font-family:var(--font-body); font-size:.9375rem; padding:.6rem .875rem; outline:none; transition:border-color .18s; }
+    .lg-field input:focus { border-color:var(--navy); box-shadow:0 0 0 3px rgba(26,39,68,.1); }
+    #login-err { color:var(--red); font-size:.8rem; margin-bottom:.75rem; display:none; padding:.5rem .75rem; background:var(--red-dim); border-radius:6px; }
+    .btn-login-ov { width:100%; padding:.8rem; border-radius:8px; background:var(--navy); color:#fff; font-family:var(--font-body); font-size:.9375rem; font-weight:600; border:none; cursor:pointer; transition:background .2s; }
+    .btn-login-ov:hover { background:var(--navy-mid); }
+
+    main { flex:1; padding:2rem 1.5rem; max-width:1300px; margin:0 auto; width:100%; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.75rem; animation:fadeUp .4s ease both; }
+    .page-title { font-family:var(--font-head); font-size:1.5rem; font-weight:700; color:var(--ink); letter-spacing:-.02em; }
+    .page-sub { font-size:.9rem; color:var(--text-2); margin-top:.2rem; }
+
+    .btn-export { padding:.5rem 1.1rem; border-radius:7px; font-size:.8125rem; font-weight:600; border:1.5px solid var(--border); background:var(--surface); color:var(--text-2); cursor:pointer; font-family:var(--font-body); transition:border-color .2s,color .2s; align-self:center; }
+    .btn-export:hover { border-color:var(--navy); color:var(--navy); }
+
+    /* Stats */
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.875rem; margin-bottom:1.5rem; animation:fadeUp .4s .06s ease both; }
+    .stat-mini { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1rem; text-align:center; box-shadow:var(--shadow-sm); }
+    .stat-mini-num { font-family:var(--font-head); font-size:1.5rem; font-weight:700; color:var(--navy); display:block; margin-bottom:.25rem; }
+    .stat-mini-num.green { color:var(--green); }
+    .stat-mini-num.amber { color:var(--amber); }
+    .stat-mini-label { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+
+    /* Toolbar */
+    .toolbar { display:flex; flex-wrap:wrap; gap:.7rem; align-items:center; margin-bottom:1rem; animation:fadeUp .4s .1s ease both; }
+    .toolbar input { flex:1; min-width:200px; background:var(--surface); border:1.5px solid var(--border); border-radius:7px; color:var(--text); font-family:var(--font-body); font-size:.875rem; padding:.55rem .875rem; outline:none; transition:border-color .18s; }
+    .toolbar input:focus { border-color:var(--navy); box-shadow:0 0 0 3px rgba(26,39,68,.08); }
+    .toolbar input::placeholder { color:var(--muted); }
+    .filter-btn { padding:.45rem .95rem; border-radius:7px; font-size:.8125rem; font-weight:600; font-family:var(--font-body); cursor:pointer; border:1.5px solid var(--border); background:transparent; color:var(--muted); transition:all .18s; }
+    .filter-btn:hover { border-color:var(--navy); color:var(--navy); }
+    .filter-btn.active { border-color:var(--navy); background:rgba(26,39,68,.07); color:var(--navy); }
+    .filter-btn.voted-f.active { border-color:var(--green); background:var(--green-dim); color:var(--green); }
+    .filter-btn.pend-f.active  { border-color:var(--amber); background:var(--amber-dim); color:var(--amber); }
+    .filter-count { font-size:.8125rem; color:var(--muted); margin-left:auto; }
+
+    /* Table card */
+    .table-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm); animation:fadeUp .4s .14s ease both; }
+    .table-card-header { padding:1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .table-card-title { font-family:var(--font-head); font-size:.9rem; font-weight:600; color:var(--ink); }
+    .table-card-sub { font-size:.775rem; color:var(--muted); }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    thead th { font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:.65rem 1rem; border-bottom:2px solid var(--border); text-align:left; white-space:nowrap; background:var(--surface2); cursor:pointer; user-select:none; }
+    thead th:hover { color:var(--navy); }
+    thead th.sorted { color:var(--navy); }
+    tbody td { padding:.75rem 1rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover td { background:var(--surface2); }
+
+    .voted-badge { display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .65rem; border-radius:20px; font-size:.75rem; font-weight:600; }
+    .voted-badge.yes { color:var(--green); border:1px solid rgba(22,163,74,.3); background:var(--green-dim); }
+    .voted-badge.no  { color:var(--muted); border:1px solid var(--border); }
+    .gender-badge { font-size:.75rem; font-weight:600; padding:.15rem .55rem; border-radius:5px; border:1px solid var(--border); color:var(--text-2); }
+    .td-name  { font-weight:600; font-family:var(--font-head); font-size:.875rem; color:var(--ink); }
+    .td-email { font-size:.775rem; color:var(--muted); margin-top:.1rem; }
+    .td-cnic  { font-size:.8rem; color:var(--text-2); white-space:nowrap; }
+    .td-loc   { font-size:.775rem; color:var(--muted); }
+
+    /* Pagination */
+    .pagination { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; border-top:1px solid var(--border); font-size:.8125rem; color:var(--muted); }
+    .page-btns { display:flex; gap:.35rem; }
+    .page-btn { width:30px; height:30px; border-radius:6px; border:1.5px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; font-family:var(--font-body); font-size:.775rem; font-weight:600; display:flex; align-items:center; justify-content:center; transition:all .18s; }
+    .page-btn:hover:not(:disabled) { border-color:var(--navy); color:var(--navy); }
+    .page-btn.active { border-color:var(--navy); background:rgba(26,39,68,.08); color:var(--navy); }
+    .page-btn:disabled { opacity:.3; cursor:not-allowed; }
+
+    .empty-state { text-align:center; padding:3rem 1rem; color:var(--muted); font-size:.875rem; }
+    .empty-icon { font-size:2.5rem; display:block; margin-bottom:.75rem; }
+
+    #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff; border-radius:10px; padding:.8rem 1.5rem; font-size:.875rem; font-weight:500; min-width:260px; text-align:center; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s; opacity:0; z-index:999; pointer-events:none; box-shadow:0 8px 32px rgba(0,0,0,.15); }
+    #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+    #toast.ok { background:var(--green); }
+    #toast.err { background:var(--red); }
+    footer { text-align:center; padding:1.25rem; color:var(--muted); font-size:.8125rem; border-top:1px solid var(--border); background:var(--surface); }
+  </style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div class="login-box">
+    <p class="login-title">Admin Login</p>
+    <p class="login-sub">E-Voting System Control Panel</p>
+    <div class="lg-field"><label>Username</label><input type="text" id="adm-user" placeholder="admin" autocomplete="username"></div>
+    <div class="lg-field"><label>Password</label><input type="password" id="adm-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <div id="login-err"></div>
+    <button class="btn-login-ov" onclick="adminLogin()">Login</button>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-left">
+    <a class="nav-logo" href="index.html">E<em>·</em>Vote</a>
+    <span class="admin-tag">Admin</span>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="candidates.html">Candidates</a>
+      <a href="voters.html" class="active">Voters</a>
+      <a href="schedule.html">Schedule</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="back-link" href="../index.html">← Main Site</a>
+    <span class="admin-badge" id="admin-name"></span>
+    <button class="btn-logout" onclick="adminLogout()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Voters</h1>
+      <p class="page-sub">Complete list of registered voters with voting status and location</p>
+    </div>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-mini"><span class="stat-mini-num" id="s-total">--</span><span class="stat-mini-label">Total</span></div>
+    <div class="stat-mini"><span class="stat-mini-num green" id="s-voted">--</span><span class="stat-mini-label">Voted</span></div>
+    <div class="stat-mini"><span class="stat-mini-num" id="s-pending">--</span><span class="stat-mini-label">Pending</span></div>
+    <div class="stat-mini"><span class="stat-mini-num amber" id="s-turnout">--%</span><span class="stat-mini-label">Turnout</span></div>
+    <div class="stat-mini"><span class="stat-mini-num" id="s-male">--</span><span class="stat-mini-label">Male</span></div>
+    <div class="stat-mini"><span class="stat-mini-num" id="s-female">--</span><span class="stat-mini-label">Female</span></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="search-q" placeholder="Search by name, CNIC, or email..." oninput="applyFilters()">
+    <button class="filter-btn active"  id="f-all"   onclick="setFilter('all')">All</button>
+    <button class="filter-btn voted-f" id="f-voted" onclick="setFilter('voted')">✓ Voted</button>
+    <button class="filter-btn pend-f"  id="f-not"   onclick="setFilter('not')">Pending</button>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <span class="table-card-title">Registered Voters</span>
+      <span class="table-card-sub" id="showing-label"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortBy('name')">Name <span id="sort-name"></span></th>
+            <th onclick="sortBy('cnic')">CNIC <span id="sort-cnic"></span></th>
+            <th>Gender / Age</th>
+            <th onclick="sortBy('hasVoted')">Status <span id="sort-hasVoted"></span></th>
+            <th onclick="sortBy('voted_at')">Vote Time <span id="sort-voted_at"></span></th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody id="voters-tbody">
+          <tr><td colspan="7"><div class="empty-state"><span class="empty-icon">⏳</span>Loading voters...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span id="page-info">--</span>
+      <div class="page-btns" id="page-btns"></div>
+    </div>
+  </div>
+</main>
+
+<footer>© 2025 E-Voting System · Admin Panel</footer>
+<div id="toast"></div>
+
+<script src="admin.js"></script>
+<script>
+  const PAGE_SIZE = 20;
+  let allVoters = [], filteredVoters = [], currentPage = 1;
+  let currentFilter = "all", sortKey = "name", sortDir = 1;
+
+  window.addEventListener("DOMContentLoaded", () => { requireAdmin(onAdminReady); });
+  function onAdminReady() { loadVoters(); }
+
+  async function loadVoters() {
+    try {
+      const [vRes, sRes] = await Promise.all([
+        fetch(`${API}/admin/voters`, { credentials:"include" }),
+        fetch(`${API}/results/stats`, { credentials:"include" }),
+      ]);
+      const vData = await vRes.json();
+      allVoters = vData.voters || [];
+      setText("s-total",   vData.total   ?? "--");
+      setText("s-voted",   vData.voted   ?? "--");
+      setText("s-pending", vData.not_voted ?? "--");
+      if (vData.total > 0) setText("s-turnout", Math.round(vData.voted / vData.total * 100) + "%");
+      setText("s-male",   allVoters.filter(v => v.gender === "male").length);
+      setText("s-female", allVoters.filter(v => v.gender === "female").length);
+      applyFilters();
+    } catch(e) { showToast("Failed to load voters", "err"); }
+  }
+
+  function setFilter(f) {
+    currentFilter = f; currentPage = 1;
+    ["all","voted","not"].forEach(id => { document.getElementById(`f-${id}`)?.classList.toggle("active", id === f); });
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const q = document.getElementById("search-q").value.toLowerCase().trim();
+    filteredVoters = allVoters.filter(v => {
+      if (currentFilter === "voted" && !v.hasVoted) return false;
+      if (currentFilter === "not"   &&  v.hasVoted) return false;
+      if (q) { const h = [v.name,v.cnic,v.email,v.address].join(" ").toLowerCase(); if (!h.includes(q)) return false; }
+      return true;
+    });
+    filteredVoters.sort((a,b) => {
+      let av = a[sortKey] ?? "", bv = b[sortKey] ?? "";
+      if (typeof av === "boolean") { av = av ? 1 : 0; bv = bv ? 1 : 0; }
+      if (av < bv) return -sortDir; if (av > bv) return sortDir; return 0;
+    });
+    currentPage = 1;
+    document.getElementById("filter-count").textContent = `${filteredVoters.length} result${filteredVoters.length !== 1 ? "s" : ""}`;
+    renderTable();
+  }
+
+  function sortBy(key) {
+    if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+    ["name","cnic","hasVoted","voted_at"].forEach(k => {
+      const el = document.getElementById(`sort-${k}`);
+      if (el) el.textContent = k === sortKey ? (sortDir === 1 ? " ↑" : " ↓") : "";
+    });
+    applyFilters();
+  }
+
+  function renderTable() {
+    const total = filteredVoters.length;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end   = Math.min(start + PAGE_SIZE, total);
+    const page  = filteredVoters.slice(start, end);
+    document.getElementById("page-info").textContent     = `${start+1}–${end} / ${total}`;
+    document.getElementById("showing-label").textContent = `${filteredVoters.length} result${filteredVoters.length !== 1 ? "s" : ""}`;
+    const tbody = document.getElementById("voters-tbody");
+    if (page.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="empty-icon">🔍</span>No voters match this filter</div></td></tr>`;
+      renderPagination(0); return;
+    }
+    tbody.innerHTML = page.map((v, i) => {
+      const loc = v.vote_location;
+      const locStr = loc ? (loc.city ? `${loc.city}${loc.area ? ", "+loc.area : ""}` : `${loc.latitude?.toFixed(3)}, ${loc.longitude?.toFixed(3)}`) : "--";
+      return `
+        <tr>
+          <td style="color:var(--muted);font-size:.775rem">${start+i+1}</td>
+          <td>
+            <div class="td-name">${esc(v.name)}</div>
+            <div class="td-email">${esc(v.email)}</div>
+          </td>
+          <td class="td-cnic">${esc(v.cnic)}</td>
+          <td>
+            <span class="gender-badge">${v.gender==="male"?"♂ Male":v.gender==="female"?"♀ Female":"—"}</span>
+            <span style="font-size:.775rem;color:var(--muted);margin-left:.3rem">${v.age ?? "--"}</span>
+          </td>
+          <td><span class="voted-badge ${v.hasVoted ? "yes" : "no"}">${v.hasVoted ? "✓ Voted" : "○ Pending"}</span></td>
+          <td class="td-loc">${v.voted_at ? fmtDate(v.voted_at) : "--"}</td>
+          <td class="td-loc">${esc(locStr)}</td>
+        </tr>`;
+    }).join("");
+    renderPagination(total);
+  }
+
+  function renderPagination(total) {
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const c = document.getElementById("page-btns"); c.innerHTML = "";
+    const prev = document.createElement("button"); prev.className="page-btn"; prev.textContent="‹"; prev.disabled=currentPage===1; prev.onclick=()=>{currentPage--;renderTable();}; c.appendChild(prev);
+    for (let p = 1; p <= totalPages; p++) {
+      if (totalPages>7 && p>2 && p<totalPages-1 && Math.abs(p-currentPage)>2) {
+        if (p===3||p===totalPages-2) { const d=document.createElement("button"); d.className="page-btn"; d.textContent="…"; d.disabled=true; c.appendChild(d); } continue;
+      }
+      const btn = document.createElement("button"); btn.className=`page-btn ${p===currentPage?"active":""}`; btn.textContent=p; btn.onclick=()=>{currentPage=p;renderTable();}; c.appendChild(btn);
+    }
+    const next=document.createElement("button"); next.className="page-btn"; next.textContent="›"; next.disabled=currentPage>=totalPages; next.onclick=()=>{currentPage++;renderTable();}; c.appendChild(next);
+  }
+
+  function exportCSV() {
+    const headers = ["Name","CNIC","Email","Gender","Age","Address","Voted","Vote Time","City"];
+    const rows = filteredVoters.map(v => {
+      const loc = v.vote_location;
+      return [v.name,v.cnic,v.email,v.gender,v.age,v.address,v.hasVoted?"Yes":"No",v.voted_at?new Date(v.voted_at).toLocaleString():"",loc?.city||""]
+        .map(f=>`"${String(f??"").replace(/"/g,'""')}"`).join(",");
+    });
+    const csv  = [headers.join(","),...rows].join("\n");
+    const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a"); a.href=url; a.download=`voters_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    showToast("✓ CSV exported successfully", "ok");
+  }
+
+  function esc(str) { if(!str) return ""; return str.replace(/[&<>]/g,m=>m==="&"?"&amp;":m==="<"?"&lt;":"&gt;"); }
+</script>
+</body>
+</html>

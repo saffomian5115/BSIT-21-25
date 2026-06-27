@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FourWheels — Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070709;
+      --surface: #0e0e11;
+      --card: #14141a;
+      --border: #222228;
+      --accent: #e8390e;
+      --accent-glow: rgba(232,57,14,0.22);
+      --text: #f0f0f0;
+      --muted: #5e5e68;
+      --input-bg: #0b0b0e;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background grid + glow */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(232,57,14,0.07) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.025) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.025) 60px);
+      pointer-events: none;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: float-orb 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: rgba(232,57,14,0.08);
+      top: -100px; right: -80px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: rgba(232,57,14,0.05);
+      bottom: -80px; left: -60px;
+      animation-delay: 3s;
+    }
+
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0,0); }
+      50% { transform: translate(20px, -20px); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 420px;
+      max-width: calc(100vw - 2rem);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      animation: emerge 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    @keyframes emerge {
+      from { opacity: 0; transform: scale(0.94) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Admin shield icon */
+    .shield {
+      width: 60px; height: 60px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(232,57,14,0.3);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .shield::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(232,57,14,0.3), transparent 60%);
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .warning-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(232,57,14,0.08);
+      border: 1px solid rgba(232,57,14,0.2);
+      color: var(--accent);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .field {
+      margin-bottom: 1.15rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+      font-weight: 600;
+    }
+
+    .field-wrap { position: relative; }
+
+    .field input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field input::placeholder { color: var(--muted); }
+    .field input.error { border-color: #ef4444; }
+
+    .toggle-pass {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .toggle-pass:hover { color: var(--text); }
+
+    .err-msg {
+      font-size: 0.73rem;
+      color: #ef4444;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+
+    .btn-submit:hover {
+      background: #c72e08;
+      box-shadow: 0 4px 24px var(--accent-glow);
+    }
+
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .back-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-link a:hover { text-decoration: underline; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Wordmark at bottom */
+    .wordmark {
+      text-align: center;
+      margin-top: 1.75rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .wordmark span { color: var(--accent); }
+
+    .toast {
+      position: fixed;
+      top: 1.5rem; right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      padding: 0.9rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: all 0.3s;
+      max-width: 300px;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-left-color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="card">
+  <div class="shield">🛡️</div>
+
+  <div class="card-title">Admin Access</div>
+  <div class="card-subtitle">
+    <span class="warning-pill">⚡ Restricted</span>
+    Authorized personnel only
+  </div>
+
+  <form id="loginForm" novalidate>
+    <div class="field">
+      <label for="email">Admin Email</label>
+      <input type="email" id="email" placeholder="admin@fourwheels.pk" autocomplete="email"/>
+      <div class="err-msg" id="emailErr">Enter a valid email address</div>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <div class="field-wrap">
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+        <span class="toggle-pass" id="togglePass">SHOW</span>
+      </div>
+      <div class="err-msg" id="passErr">Password is required</div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">
+      <span id="btnText">Enter Admin Panel</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </form>
+
+  <div class="divider">or</div>
+
+  <div class="back-link">
+    Not an admin? <a href="login.html">Regular Login →</a>
+  </div>
+
+  <div class="wordmark">Four<span>Wheels</span> &nbsp;·&nbsp; Admin</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+
+  // Already logged in as admin?
+  const stored = JSON.parse(localStorage.getItem('fw_user') || '{}');
+  if (localStorage.getItem('fw_token') && stored.role === 'admin') {
+    window.location.href = 'admin-dashboard.html';
+  }
+
+  // Toggle password
+  const passInput = document.getElementById('password');
+  document.getElementById('togglePass').addEventListener('click', () => {
+    const show = passInput.type === 'password';
+    passInput.type = show ? 'text' : 'password';
+    document.getElementById('togglePass').textContent = show ? 'HIDE' : 'SHOW';
+  });
+
+  function showToast(msg, type = 'error') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type === 'error' ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function validate() {
+    let ok = true;
+
+    const email = document.getElementById('email').value;
+    const pass  = document.getElementById('password').value;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passOk  = pass.length > 0;
+
+    document.getElementById('email').classList.toggle('error', !emailOk);
+    document.getElementById('emailErr').style.display = emailOk ? 'none' : 'block';
+    document.getElementById('password').classList.toggle('error', !passOk);
+    document.getElementById('passErr').style.display = passOk ? 'none' : 'block';
+
+    if (!emailOk || !passOk) ok = false;
+    return ok;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const btn     = document.getElementById('submitBtn');
+    const txt     = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled = true;
+    txt.style.display = 'none';
+    spinner.style.display = 'block';
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.user.role !== 'admin') {
+          showToast('Access denied — Admin accounts only', 'error');
+          btn.disabled = false;
+          txt.style.display = 'block';
+          spinner.style.display = 'none';
+          return;
+        }
+        localStorage.setItem('fw_token', data.token);
+        localStorage.setItem('fw_user', JSON.stringify(data.user));
+        showToast('Access granted! Entering panel…', 'success');
+        setTimeout(() => window.location.href = 'admin-dashboard.html', 1200);
+      } else {
+        showToast(data.message || 'Login failed', 'error');
+        btn.disabled = false;
+        txt.style.display = 'block';
+        spinner.style.display = 'none';
+      }
+    } catch (err) {
+      showToast('Cannot connect to server', 'error');
+      btn.disabled = false;
+      txt.style.display = 'block';
+      spinner.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

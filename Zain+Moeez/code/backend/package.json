@@ -1,0 +1,35 @@
+{
+  "name": "fourwheals",
+  "version": "1.0.0",
+  "description": "Pakistan's Vehicle Marketplace — FYP Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node scripts/seedData.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saffomian5115/FourWheals.git"
+  },
+  "keywords": ["vehicles", "marketplace", "pakistan", "cars", "bikes"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/saffomian5115/FourWheals/issues"
+  },
+  "homepage": "https://github.com/saffomian5115/FourWheals#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.5.0",
+    "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
