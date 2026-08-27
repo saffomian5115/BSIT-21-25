@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════
+#   AI-GastroCare-official — .gitignore
+# ═══════════════════════════════════════
+
+# ── Node modules (dono folders mein) ──
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# ── Environment variables (SECRET!) ──
+.env
+.env.local
+.env.development
+.env.production
+server/.env
+
+# ── React build folder ──
+client/build/
+client/.cache/
+
+# ── Logs ──
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── VS Code settings ──
+.vscode/
+*.code-workspace
+
+# ── Coverage reports ──
+coverage/
+.nyc_output/
+
+# ── Misc ──
+*.pid
+*.seed
+*.pid.lock
+dist/
+tmp/
